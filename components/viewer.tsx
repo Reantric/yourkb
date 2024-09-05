@@ -57,7 +57,6 @@ const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ bg_color, fg_color, hexSt
         ref={canvasRef}
         width={GRID_SIZE * PIXEL_SIZE}
         height={GRID_SIZE * PIXEL_SIZE}
-        style={{ border: '1px solid black' }}
       />
     </div>
   );
