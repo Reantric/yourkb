@@ -35,6 +35,13 @@ export default function Signup({ searchParams }: { searchParams: Message }) {
             minLength={6}
             required
           />
+          <Label htmlFor="confirmPassword">Confirm password</Label>
+          <Input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm password"
+            required
+          />
           <SubmitButton formAction={signUpAction} pendingText="Signing up...">
             Sign up
           </SubmitButton>
