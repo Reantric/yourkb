@@ -18,7 +18,7 @@ export default async function AuthButton() {
         </Link>
       </Button>
       <form action={signOutAction}>
-        <Button type="submit" variant={"outline"}>
+        <Button type="submit" size="sm" variant={"outline"}>
           Sign out
         </Button>
       </form>
