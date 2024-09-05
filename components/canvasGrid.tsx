@@ -168,6 +168,7 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
         ref={canvasRef}
         width={GRID_SIZE * PIXEL_SIZE}
         height={GRID_SIZE * PIXEL_SIZE}
+        className="touch-none"
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
