@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, MouseEvent } from 'react';
+import { Button } from './ui/button';
 
 const PIXEL_SIZE = 5;
 const GRID_SIZE = 64;
@@ -153,11 +154,19 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
       />
-      <button onClick={toggleEraser}>
-        {isEraser ? 'Switch to Draw' : 'Switch to Eraser'}
-      </button>
-      <button onClick={clearCanvas}>Clear Canvas</button>
-      <button onClick={handleSave}>Save Changes</button>
+      <div className='flex flex-col space-y-2 py-2'>
+        <Button asChild size="sm" variant={"outline"}>
+          <button onClick={toggleEraser}>
+            {isEraser ? 'Switch to Draw' : 'Switch to Eraser'}
+          </button>
+        </Button>
+        <Button asChild size="sm" variant={"outline"}>
+          <button onClick={handleSave}>Save Changes</button>
+        </Button>
+        <Button asChild size="sm" variant={"destructive"}>
+          <button onClick={clearCanvas}>Clear Canvas</button>
+        </Button>
+      </div>
     </div>
   );
 };
