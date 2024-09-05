@@ -10,11 +10,11 @@ export default async function AuthButton() {
   } = await createClient().auth.getUser();
 
   return user ? (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2">
       Hey, {user.email}!
       <Button asChild size="sm" variant={"outline"}>
         <Link href='/protected'>
-          Edit KB
+          Edit your KB
         </Link>
       </Button>
       <form action={signOutAction}>
