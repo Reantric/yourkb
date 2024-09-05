@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, MouseEvent } from 'react';
+import React, { useState, useRef, useEffect, MouseEvent, TouchEvent } from 'react';
 import { Button } from './ui/button';
 
 const PIXEL_SIZE = 5;
@@ -64,6 +64,18 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
     drawGrid();
   }, [binaryString, fg_color, bg_color]);
 
+  const getMouseOrTouchPosition = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const y = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    return {
+      x: Math.floor((x - rect.left) / PIXEL_SIZE),
+      y: Math.floor((y - rect.top) / PIXEL_SIZE),
+    };
+  };
+
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     setDrawing(true);
     updatePixel(e);
@@ -79,20 +91,27 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
     }
   };
 
-  const updatePixel = (e: MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    const pixelSize = PIXEL_SIZE;
-    const gridSize = GRID_SIZE;
+  const handleTouchStart = (e: TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    setDrawing(true);
+    updatePixel(e);
+  };
 
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / pixelSize);
-    const y = Math.floor((e.clientY - rect.top) / pixelSize);
-    const index = y * gridSize + x;
+  const handleTouchEnd = () => {
+    setDrawing(false);
+  };
 
+  const handleTouchMove = (e: TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    if (drawing) {
+      updatePixel(e);
+    }
+  };
+
+  const updatePixel = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
+    const { x, y } = getMouseOrTouchPosition(e);
+
+    const index = y * GRID_SIZE + x;
     const newBinaryString = binaryString.split('');
     newBinaryString[index] = isEraser ? '0' : '1';
     setBinaryString(newBinaryString.join(''));
@@ -106,9 +125,8 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    const pixelSize = PIXEL_SIZE;
     ctx.fillStyle = color;
-    ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+    ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
   };
 
   const clearCanvas = () => {
@@ -153,6 +171,9 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
       />
       <div className='flex flex-col space-y-2 py-2'>
         <Button asChild size="sm" variant={"outline"}>
