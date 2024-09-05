@@ -49,7 +49,8 @@ const Editor: React.FC<EditorProps> = ({ initFgColor, initBgColor, initHexString
                         backgroundColor: fgColor,
                         width: '40px',
                         height: '40px',
-                        border: 'none',
+                        border: 'solid 0.25 rem',
+                        borderColor: 'foreground',
                         borderRadius: '4px',
                         cursor: 'pointer'
                     }}
@@ -64,7 +65,8 @@ const Editor: React.FC<EditorProps> = ({ initFgColor, initBgColor, initHexString
                         backgroundColor: bgColor,
                         width: '40px',
                         height: '40px',
-                        border: 'none',
+                        border: 'solid 0.25 rem',
+                        borderColor: 'foreground',
                         borderRadius: '4px',
                         cursor: 'pointer'
                     }}
