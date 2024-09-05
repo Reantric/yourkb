@@ -63,6 +63,17 @@ export default function RootLayout({
                     Next.js
                   </a>
                 </span>
+                <span className="flex items-center gap-1">
+                  <p>Created by</p>
+                  <a
+                    href="https://ezou626.github.io/"
+                    target="_blank"
+                    className="font-bold hover:underline"
+                    rel="noreferrer"
+                  >
+                    Eric Zou
+                  </a>
+                </span>
               </footer>
             </div>
           </main>
