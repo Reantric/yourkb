@@ -1,4 +1,4 @@
-import CanvasGrid from "@/components/editorGrid";
+import Editor from "@/components/editor";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -49,7 +49,7 @@ export default async function ProtectedPage() {
       <div className="w-full">
         <h1 className="font-bold text-2xl mb-4">Your Kilobyte</h1>
       </div>
-      <CanvasGrid fg_color={fg_color} bg_color={bg_color} hexString={value}></CanvasGrid>
+      <Editor initBgColor={bg_color} initFgColor={fg_color} initHexString={value}></Editor>
     </div>
   );
 }
