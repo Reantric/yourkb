@@ -1,6 +1,8 @@
 # YourKB
 [Try It Out](https://yourkb.vercel.app)
 
+[An Example Drawing](https://yourkb.vercel.app/view/1)
+
 Digital drawing sharing app
 
 Create an account, draw anything, and share it with another person, all in a single KB!
