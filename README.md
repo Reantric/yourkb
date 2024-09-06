@@ -14,3 +14,6 @@ Create an account, draw anything, and share it with another person, all in a sin
 
 ## Time Spent
 A few hours
+
+## Known Bugs
+When signing out on Chrome mobile on iOS, a client side error occurs. Refreshing the page gets rid of the error.
