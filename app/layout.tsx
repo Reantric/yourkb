@@ -43,7 +43,7 @@ export default function RootLayout({
                 {children}
               </div>
 
-              <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
+              <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-12 py-16">
                 <span className="flex items-center gap-1">
                   Powered by{" "}
                   <a
@@ -74,6 +74,16 @@ export default function RootLayout({
                   >
                     Eric Zou
                   </a>
+                </span>
+                <span className="flex items-center gap-1">
+                  <Link
+                    href="/policies/privacy"
+                    target="_blank"
+                    className="font-bold hover:underline"
+                    rel="noreferrer"
+                  >
+                    Privacy Policy
+                  </Link>
                 </span>
               </footer>
             </div>
