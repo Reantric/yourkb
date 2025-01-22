@@ -6,7 +6,7 @@ export default async function ViewKilobyte({ params }: { params: { slug: string 
 
   const { slug } = params;
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
         .from('kilobytes')

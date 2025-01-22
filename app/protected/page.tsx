@@ -8,7 +8,7 @@ const DEFAULT_BG = '#ffffff';
 const DEFAULT_FG = '#000000';
 
 export default async function ProtectedPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
