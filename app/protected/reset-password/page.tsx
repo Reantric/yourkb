@@ -9,6 +9,7 @@ export default async function ResetPassword({
 }: {
   searchParams: Promise<Message>;
 }) {
+  const message = await searchParams;
   return <form className="flex flex-col w-full max-w-md p-4 gap-2 [&>input]:mb-4">
     <h1 className="text-2xl font-medium">Reset password</h1>
     <p className="text-sm text-foreground/60">
@@ -33,6 +34,6 @@ export default async function ResetPassword({
     <SubmitButton formAction={resetPasswordAction}>
       Reset password
     </SubmitButton>
-    <FormMessage message={searchParams} />
+    <FormMessage message={message} />
   </form>;
 }
