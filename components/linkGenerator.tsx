@@ -14,19 +14,15 @@ const CopyLinkButton: React.FC<CopyLinkButtonProps> = ({ id }) => {
         }
     };
 
-    return (
-        <div className="text-2xl">
-            {id !== -1 ? (
-              <Button variant={'ghost'}><button 
-              onClick={handleCopyLink}
-          >
-              Copy Sharing Link
-          </button></Button>
-            ) : (
-              <Button variant={'ghost'}><span>Link Error</span></Button>
-            )}
-        </div>
-    );
+    return <div className="text-2xl">
+      {id !== -1 ? (
+        <Button variant={'ghost'} onClick={handleCopyLink}>
+          Copy Sharing Link
+        </Button>
+      ) : (
+        <Button variant={'ghost'}><span>Link Error</span></Button>
+      )}
+    </div>;
 };
 
 export default CopyLinkButton;
