@@ -2,7 +2,7 @@ import CanvasDisplay from "@/components/viewer";
 
 import { createClient } from '@/utils/supabase/server';
 
-export default async function ViewKilobyte({ params }: { params: { slug: string } }) {
+export default async function ViewKilobyte({ params }: { params: Promise<{ slug: string }> }) {
 
   const { slug } = await params;
 
