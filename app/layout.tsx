@@ -39,9 +39,9 @@ export default function RootLayout({
                   <HeaderAuth />
                 </div>
               </nav>
-              <div className="flex flex-col gap-20 max-w-5xl p-5">
+              <main className="flex flex-col gap-20 max-w-5xl p-5">
                 {children}
-              </div>
+              </main>
 
               <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-12 py-16">
                 <span className="flex items-center gap-1">
