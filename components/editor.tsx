@@ -39,7 +39,7 @@ const Editor: React.FC<EditorProps> = ({ initFgColor, initBgColor, initHexString
 
     return (
         <>
-            <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }} className='pb-6'>
                 {/* Foreground Color Button */}
                 <span style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
                 <p>Pen Color</p>
