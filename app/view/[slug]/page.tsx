@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 
 export default async function ViewKilobyte({ params }: { params: { slug: string } }) {
 
-  const { slug } = params;
+  const { slug } = await params;
 
   const supabase = await createClient();
 
