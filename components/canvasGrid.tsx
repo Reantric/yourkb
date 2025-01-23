@@ -176,17 +176,17 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
         onTouchEnd={handleTouchEnd}
         onTouchMove={handleTouchMove}
       />
-      <div className='flex flex-col space-y-2 py-2'>
+      <div className='flex flex-col space-y-4 pt-2'>
         <Button asChild size="sm" variant={"outline"}>
           <button onClick={toggleEraser}>
             {isEraser ? 'Switch to Draw' : 'Switch to Eraser'}
           </button>
         </Button>
-        <Button asChild size="sm" variant={"outline"}>
-          <button onClick={handleSave}>Save Changes</button>
-        </Button>
         <Button asChild size="sm" variant={"destructive"}>
           <button onClick={clearCanvas}>Clear Canvas</button>
+        </Button>
+        <Button asChild size="sm" variant={"outline"}>
+          <button onClick={handleSave}>Save Changes</button>
         </Button>
       </div>
     </div>

@@ -2,11 +2,11 @@ import CanvasDisplay from "@/components/viewer";
 
 import { createClient } from '@/utils/supabase/server';
 
-export default async function ViewKilobyte({ params }: { params: { slug: string } }) {
+export default async function ViewKilobyte({ params }: { params: Promise<{ slug: string }> }) {
 
-  const { slug } = params;
+  const { slug } = await params;
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
         .from('kilobytes')
@@ -14,16 +14,14 @@ export default async function ViewKilobyte({ params }: { params: { slug: string 
         .eq('id', slug);
 
   return (
-    <>
-      <main className="flex-1 flex flex-col gap-6 px-4">
-        {(data && data.length !== 0) ? 
-          <CanvasDisplay 
-            fg_color={data[0].fg_color} 
-            bg_color={data[0].bg_color} 
-            hexString={data[0].value}>
-            </CanvasDisplay> 
-            : <p>This KB seems to be missing.</p>}
-      </main>
-    </>
+    <div className="flex-1 flex flex-col gap-6 px-4">
+      {(data && data.length !== 0) ? 
+        <CanvasDisplay 
+          fg_color={data[0].fg_color} 
+          bg_color={data[0].bg_color} 
+          hexString={data[0].value}>
+          </CanvasDisplay> 
+          : <p>This KB seems to be missing.</p>}
+    </div>
   );
 }

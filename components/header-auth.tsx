@@ -5,9 +5,12 @@ import { createClient } from "@/utils/supabase/server";
 import { ThemeSwitcher } from "./theme-switcher";
 
 export default async function AuthButton() {
+
+  const client = await createClient();
+
   const {
     data: { user },
-  } = await createClient().auth.getUser();
+  } = await client.auth.getUser();
 
   return user ? (
     <div className="flex items-center gap-2">
