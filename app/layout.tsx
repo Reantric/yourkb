@@ -78,11 +78,19 @@ export default function RootLayout({
                 <span className="flex items-center gap-1">
                   <Link
                     href="/policies/privacy"
-                    target="_blank"
                     className="font-bold hover:underline"
                     rel="noreferrer"
                   >
                     Privacy Policy
+                  </Link>
+                </span>
+                <span className="flex items-center gap-1">
+                  <Link
+                    href="/changelog"
+                    className="font-bold hover:underline"
+                    rel="noreferrer"
+                  >
+                    Changelog
                   </Link>
                 </span>
               </footer>
