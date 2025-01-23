@@ -50,9 +50,9 @@ export default async function ProtectedPage() {
     value = data[0].value;
   }
 
-  return <div className="flex-1 w-full flex flex-col gap-6">
-    <h1 className="text-4xl">Your Kilobyte</h1>
-    <CopyLinkButton id={id}></CopyLinkButton>
+  return <div className="flex-1 w-full flex flex-col">
+    <h1 className="text-4xl pb-6">Your Kilobyte</h1>
     <Editor initBgColor={bg_color} initFgColor={fg_color} initHexString={value}></Editor>
+    <CopyLinkButton id={id}></CopyLinkButton>
   </div>;
 }
