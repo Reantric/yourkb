@@ -1,11 +1,11 @@
-export type change = {
+export type Change = {
     year: number;
     month: number;
     day: number;
     description: string;
 };
 
-export const CHANGES: change[] = [
+export const CHANGES: Change[] = [
   {
     year: 2025,
     month: 1,
