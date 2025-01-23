@@ -10,6 +10,6 @@ export const CHANGES: Change[] = [
     year: 2025,
     month: 1,
     day: 22,
-    description: 'Added a changelog'
+    description: 'Added a changelog, some visual updates and resolved some hidden warnings'
   }
 ]
