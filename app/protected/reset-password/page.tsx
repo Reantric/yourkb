@@ -16,6 +16,7 @@ export default async function ResetPassword({
     </p>
     <Label htmlFor="password">New password</Label>
     <Input
+      id='password'
       type="password"
       name="password"
       placeholder="New password"
@@ -23,6 +24,7 @@ export default async function ResetPassword({
     />
     <Label htmlFor="confirmPassword">Confirm password</Label>
     <Input
+      id='confirmPassword'
       type="password"
       name="confirmPassword"
       placeholder="Confirm password"
