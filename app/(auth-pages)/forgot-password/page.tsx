@@ -8,7 +8,7 @@ import Link from "next/link";
 export default async function ForgotPassword({
   searchParams,
 }: {
-  searchParams: Message;
+  searchParams: Promise<Message>;
 }) {
 
   const message = await searchParams;
