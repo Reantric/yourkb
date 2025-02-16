@@ -10,19 +10,30 @@ export default async function Index() {
     </p>
     <div className="flex flex-col gap-4 items-center">
       <ul className="flex text-md text-center justify-between items-center space-x-20">
-        <li><Link
-                href="/sign-up"
-                className="hover:underline"
-              >
-                Create an account
-              </Link></li>
-        <li>Draw something amazing</li>
-        <li><Link
-                href="/view/1"
-                className="hover:underline"
-              >
-                Share the link
-              </Link></li>
+        <li>
+          <Link
+            href="/sign-up"
+            className="hover:underline"
+          >
+            Create an account
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/gallery"
+            className="hover:underline"
+          >
+            Draw something amazing
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/view/1"
+            className="hover:underline"
+          >
+              Share the link
+          </Link>
+        </li>
       </ul>
     </div>
   </div>;
