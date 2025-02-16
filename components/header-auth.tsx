@@ -20,6 +20,11 @@ export default async function AuthButton() {
           Edit your KB
         </Link>
       </Button>
+      <Button asChild size="sm" variant={"outline"}>
+        <Link href='/gallery'>
+          Gallery
+        </Link>
+      </Button>
       <form action={signOutAction}>
         <Button type="submit" size="sm" variant={"outline"}>
           Sign out
@@ -29,6 +34,11 @@ export default async function AuthButton() {
     </div>
   ) : (
     <div className="flex gap-2">
+      <Button asChild size="sm" variant={"outline"}>
+        <Link href='/gallery'>
+          Gallery
+        </Link>
+      </Button>
       <Button asChild size="sm" variant={"outline"}>
         <Link href="/sign-in">Sign in</Link>
       </Button>
