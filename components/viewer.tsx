@@ -9,6 +9,7 @@ interface CanvasDisplayProps {
   fg_color: string;
   bg_color: string;
   hexString: string;
+  pixel_size: number;
 }
 
 // Function to convert hex string to binary string
@@ -22,7 +23,7 @@ const hexToBinaryString = (hexString: string): string => {
   return binaryString;
 };
 
-const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ bg_color, fg_color, hexString }) => {
+const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ bg_color, fg_color, hexString, pixel_size }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const binaryString = hexToBinaryString(hexString);
 
@@ -32,7 +33,7 @@ const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ bg_color, fg_color, hexSt
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const pixelSize = PIXEL_SIZE;
+    const pixelSize = pixel_size;
     const gridSize = GRID_SIZE;
 
     // Draw the grid
@@ -55,8 +56,8 @@ const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ bg_color, fg_color, hexSt
     <div>
       <canvas
         ref={canvasRef}
-        width={GRID_SIZE * PIXEL_SIZE}
-        height={GRID_SIZE * PIXEL_SIZE}
+        width={GRID_SIZE * pixel_size}
+        height={GRID_SIZE * pixel_size}
       />
     </div>
   );
