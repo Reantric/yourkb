@@ -5,7 +5,6 @@ import { createClient } from "@/utils/supabase/server";
 import { ThemeSwitcher } from "./theme-switcher";
 
 export default async function AuthButton() {
-
   const client = await createClient();
 
   const {
@@ -16,14 +15,10 @@ export default async function AuthButton() {
     <div className="flex items-center gap-2">
       Hey, {user.email}!
       <Button asChild size="sm" variant={"outline"}>
-        <Link href='/protected'>
-          Edit your KB
-        </Link>
+        <Link href="/protected">Edit your KB</Link>
       </Button>
       <Button asChild size="sm" variant={"outline"}>
-        <Link href='/gallery'>
-          Gallery
-        </Link>
+        <Link href="/gallery">Gallery</Link>
       </Button>
       <form action={signOutAction}>
         <Button type="submit" size="sm" variant={"outline"}>
@@ -35,9 +30,7 @@ export default async function AuthButton() {
   ) : (
     <div className="flex gap-2">
       <Button asChild size="sm" variant={"outline"}>
-        <Link href='/gallery'>
-          Gallery
-        </Link>
+        <Link href="/gallery">Gallery</Link>
       </Button>
       <Button asChild size="sm" variant={"outline"}>
         <Link href="/sign-in">Sign in</Link>

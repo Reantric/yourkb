@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState, useRef, useEffect, MouseEvent, TouchEvent } from 'react';
-import { Button } from './ui/button';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  MouseEvent,
+  TouchEvent,
+} from "react";
+import { Button } from "./ui/button";
 
 const PIXEL_SIZE = 5;
 const GRID_SIZE = 64;
@@ -14,37 +20,43 @@ interface CanvasGridProps {
 
 // Function to convert hex string to binary string
 const hexToBinaryString = (hexString: string): string => {
-  let binaryString = '';
+  let binaryString = "";
   for (let i = 0; i < hexString.length; i += 2) {
     const hexPair = hexString.slice(i, i + 2);
-    const binaryOctet = parseInt(hexPair, 16).toString(2).padStart(8, '0');
+    const binaryOctet = parseInt(hexPair, 16).toString(2).padStart(8, "0");
     binaryString += binaryOctet;
   }
   return binaryString;
 };
 
 const binaryStringToHex = (binaryString: string): string => {
-    let hexString = '';
-    for (let i = 0; i < binaryString.length; i += 8) {
-        const binaryOctet = binaryString.slice(i, i + 8);
-        const hexPair = parseInt(binaryOctet, 2).toString(16).padStart(2, '0');
-        hexString += hexPair
-    }
-    return hexString;
-}
+  let hexString = "";
+  for (let i = 0; i < binaryString.length; i += 8) {
+    const binaryOctet = binaryString.slice(i, i + 8);
+    const hexPair = parseInt(binaryOctet, 2).toString(16).padStart(2, "0");
+    hexString += hexPair;
+  }
+  return hexString;
+};
 
-const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }) => {
+const CanvasGrid: React.FC<CanvasGridProps> = ({
+  bg_color,
+  fg_color,
+  hexString,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [binaryString, setBinaryString] = useState<string>(hexToBinaryString(hexString));
+  const [binaryString, setBinaryString] = useState<string>(
+    hexToBinaryString(hexString),
+  );
   const [drawing, setDrawing] = useState<boolean>(false);
   const [isEraser, setIsEraser] = useState<boolean>(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    
+
     const pixelSize = PIXEL_SIZE;
     const gridSize = GRID_SIZE;
 
@@ -54,7 +66,7 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
       for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
           const index = y * gridSize + x;
-          const bit = binaryString[index] === '1';
+          const bit = binaryString[index] === "1";
           ctx.fillStyle = bit ? fg_color : bg_color;
           ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
         }
@@ -64,12 +76,14 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
     drawGrid();
   }, [binaryString, fg_color, bg_color]);
 
-  const getMouseOrTouchPosition = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
+  const getMouseOrTouchPosition = (
+    e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>,
+  ) => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
-    const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const y = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const x = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const y = "touches" in e ? e.touches[0].clientY : e.clientY;
     return {
       x: Math.floor((x - rect.left) / PIXEL_SIZE),
       y: Math.floor((y - rect.top) / PIXEL_SIZE),
@@ -108,13 +122,15 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
     }
   };
 
-  const updatePixel = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
+  const updatePixel = (
+    e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>,
+  ) => {
     const { x, y } = getMouseOrTouchPosition(e);
 
     const index = y * GRID_SIZE + x;
-    const newBinaryString = binaryString.split('');
-    newBinaryString[index] = isEraser ? '0' : '1';
-    setBinaryString(newBinaryString.join(''));
+    const newBinaryString = binaryString.split("");
+    newBinaryString[index] = isEraser ? "0" : "1";
+    setBinaryString(newBinaryString.join(""));
 
     drawPixel(x, y, isEraser ? bg_color : fg_color);
   };
@@ -122,15 +138,15 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
   const drawPixel = (x: number, y: number, color: string) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    
+
     ctx.fillStyle = color;
     ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
   };
 
   const clearCanvas = () => {
-    setBinaryString('0'.repeat(4096));
+    setBinaryString("0".repeat(4096));
   };
 
   const toggleEraser = () => {
@@ -139,26 +155,26 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
 
   const handleSave = async () => {
     try {
-      const response = await fetch('/api/updatekb', {
-        method: 'POST',
+      const response = await fetch("/api/updatekb", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           bg_color: bg_color,
           fg_color: fg_color,
-          value: binaryStringToHex(binaryString)
+          value: binaryStringToHex(binaryString),
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save changes');
+        throw new Error("Failed to save changes");
       }
 
       const data = await response.json();
-      console.log('Save successful:', data);
+      console.log("Save successful:", data);
     } catch (error) {
-      console.error('Error saving changes:', error);
+      console.error("Error saving changes:", error);
     }
   };
 
@@ -176,10 +192,10 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({ bg_color, fg_color, hexString }
         onTouchEnd={handleTouchEnd}
         onTouchMove={handleTouchMove}
       />
-      <div className='flex flex-col space-y-4 pt-2'>
+      <div className="flex flex-col space-y-4 pt-2">
         <Button asChild size="sm" variant={"outline"}>
           <button onClick={toggleEraser}>
-            {isEraser ? 'Switch to Draw' : 'Switch to Eraser'}
+            {isEraser ? "Switch to Draw" : "Switch to Eraser"}
           </button>
         </Button>
         <Button asChild size="sm" variant={"destructive"}>
