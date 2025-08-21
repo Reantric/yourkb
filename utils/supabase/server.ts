@@ -17,10 +17,11 @@ export const createClient = async () => {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
             });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (error) {
             // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // This can be ignored if we have middleware refreshing
+            // user sessions, which we do.
           }
         },
       },

@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from "react";
 
-const PIXEL_SIZE = 5;
 const GRID_SIZE = 64;
 
 interface CanvasDisplayProps {
@@ -14,23 +13,28 @@ interface CanvasDisplayProps {
 
 // Function to convert hex string to binary string
 const hexToBinaryString = (hexString: string): string => {
-  let binaryString = '';
+  let binaryString = "";
   for (let i = 0; i < hexString.length; i += 2) {
     const hexPair = hexString.slice(i, i + 2);
-    const binaryOctet = parseInt(hexPair, 16).toString(2).padStart(8, '0');
+    const binaryOctet = parseInt(hexPair, 16).toString(2).padStart(8, "0");
     binaryString += binaryOctet;
   }
   return binaryString;
 };
 
-const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ bg_color, fg_color, hexString, pixel_size }) => {
+const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
+  bg_color,
+  fg_color,
+  hexString,
+  pixel_size,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const binaryString = hexToBinaryString(hexString);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const pixelSize = pixel_size;
@@ -42,7 +46,7 @@ const CanvasDisplay: React.FC<CanvasDisplayProps> = ({ bg_color, fg_color, hexSt
       for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
           const index = y * gridSize + x;
-          const bit = binaryString[index] === '1';
+          const bit = binaryString[index] === "1";
           ctx.fillStyle = bit ? fg_color : bg_color;
           ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
         }
