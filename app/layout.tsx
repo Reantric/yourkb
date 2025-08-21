@@ -52,7 +52,7 @@ export default function RootLayout({
                     className="font-bold hover:underline"
                     rel="noreferrer"
                   >
-                    Supabase 
+                    Supabase
                   </a>
                   <p>and</p>
                   <a

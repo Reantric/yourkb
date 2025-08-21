@@ -1,8 +1,8 @@
 export type Change = {
-    year: number;
-    month: number;
-    day: number;
-    description: string;
+  year: number;
+  month: number;
+  day: number;
+  description: string;
 };
 
 export const CHANGES: Change[] = [
@@ -10,6 +10,7 @@ export const CHANGES: Change[] = [
     year: 2025,
     month: 1,
     day: 22,
-    description: 'Added a changelog, some visual updates and resolved some hidden warnings'
-  }
-]
+    description:
+      "Added a changelog, some visual updates and resolved some hidden warnings",
+  },
+];
