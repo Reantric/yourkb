@@ -39,7 +39,7 @@ export default async function ViewKilobyte({
         fg_color={data[0].fg_color}
         bg_color={data[0].bg_color}
         hexString={data[0].value}
-        pixel_size={5}
+        pixel_size={window.innerWidth <= 600 ? 3 : 5}
       />
       <CopyLinkButton id={data[0].id}></CopyLinkButton>
     </div>
