@@ -11,27 +11,26 @@ export default async function Gallery() {
 
   if (error) {
     console.error(error);
+    return <p>An error occurred when fetching KBs.</p>;
+  }
+
+  if (!data || data.length === 0) {
+    return <p>No KBs to display.</p>;
   }
 
   return (
     <div className="flex-1 flex flex-col gap-6 px-4">
-      <ul className="grid grid-cols-3 gap-4">
-        {data ? (
-          data.map((item) => (
-            <li key={item.id}>
-              <Link href={`/view/${item.id}`}>
-                <CanvasDisplay
-                  fg_color={item.fg_color}
-                  bg_color={item.bg_color}
-                  hexString={item.value}
-                  pixel_size={3}
-                />
-              </Link>
-            </li>
-          ))
-        ) : (
-          <p>No KBs to display.</p>
-        )}
+      <ul className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {data.map((item) => (
+          <Link href={`/view/${item.id}`} key={item.id}>
+            <CanvasDisplay
+              fg_color={item.fg_color}
+              bg_color={item.bg_color}
+              hexString={item.value}
+              pixel_size={4}
+            />
+          </Link>
+        ))}
       </ul>
     </div>
   );
