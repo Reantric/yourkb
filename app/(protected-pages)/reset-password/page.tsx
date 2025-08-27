@@ -10,6 +10,7 @@ export default async function ResetPassword({
   searchParams: Promise<Message>;
 }) {
   const message = await searchParams;
+  // theoretically, middleware gates access to this route
   return (
     <form className="flex flex-col w-full max-w-md p-4 gap-2 [&>input]:mb-4">
       <h1 className="text-2xl font-medium">Reset password</h1>

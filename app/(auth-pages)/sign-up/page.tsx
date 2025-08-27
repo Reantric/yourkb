@@ -3,9 +3,7 @@ import { FormMessage, Message } from "@/components/FormMessage";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default async function Signup({
   searchParams,
@@ -13,16 +11,6 @@ export default async function Signup({
   searchParams: Promise<Message>;
 }) {
   const message = await searchParams;
-
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user) {
-    redirect("/protected");
-  }
 
   if ("message" in message) {
     return (

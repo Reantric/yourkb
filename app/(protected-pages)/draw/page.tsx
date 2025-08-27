@@ -13,6 +13,7 @@ export default async function ProtectedPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // theoretically, middleware should handle this, but we need to check for TS
   if (!user) {
     return redirect("/sign-in");
   }
