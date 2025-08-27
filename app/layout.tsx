@@ -1,7 +1,7 @@
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import CookieConsentBanner from "@/components/cookieBanner";
+import CookieConsentBanner from "@/components/CookieBanner";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 

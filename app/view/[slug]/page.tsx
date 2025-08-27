@@ -1,5 +1,5 @@
-import CopyLinkButton from "@/components/linkGenerator";
-import CanvasDisplay from "@/components/viewer";
+import CopyLinkButton from "@/components/DrawingLink";
+import CanvasDisplay from "@/components/DrawingViewer";
 
 import { createClient } from "@/utils/supabase/server";
 

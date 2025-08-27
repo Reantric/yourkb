@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
-import CanvasGrid from "./canvasGrid";
+import CanvasGrid from "./CanvasGrid";
 
 interface EditorProps {
   initFgColor: string;

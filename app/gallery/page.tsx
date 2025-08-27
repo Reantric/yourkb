@@ -1,4 +1,4 @@
-import CanvasDisplay from "@/components/viewer";
+import CanvasDisplay from "@/components/DrawingViewer";
 
 import { createClient } from "@/utils/supabase/server";
 
