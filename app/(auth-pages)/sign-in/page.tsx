@@ -4,6 +4,8 @@ import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function Login({
   searchParams,
@@ -11,6 +13,16 @@ export default async function Login({
   searchParams: Promise<Message>;
 }) {
   const message = await searchParams;
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/protected");
+  }
 
   return (
     <form className="flex-1 flex flex-col min-w-64">
