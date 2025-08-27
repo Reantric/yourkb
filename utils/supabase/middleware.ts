@@ -57,7 +57,7 @@ export const updateSession = async (request: NextRequest) => {
       user &&
       !user.error
     ) {
-      return NextResponse.redirect(new URL("/protected", request.url));
+      return NextResponse.redirect(new URL("/draw", request.url));
     }
 
     // serve the route
