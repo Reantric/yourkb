@@ -19,7 +19,7 @@ export default async function Header() {
       </Button>
       {user && (
         <Button asChild size="sm" variant="outline">
-          <Link href="/protected">Draw</Link>
+          <Link href="/draw">Draw</Link>
         </Button>
       )}
       {!user ? (
