@@ -54,8 +54,13 @@ export default async function Header() {
           />
           <SheetCloseButton
             button={
-              <Button size="sm" variant="secondary" onClick={signOutAction}>
-                Log Out
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                onClick={signOutAction}
+              >
+                <p>Log Out</p>
               </Button>
             }
             inSheet={inSheet}
