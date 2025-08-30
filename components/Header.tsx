@@ -60,7 +60,7 @@ export default async function Header() {
                 variant="outline"
                 onClick={signOutAction}
               >
-                <p>Log Out</p>
+                <p>Sign Out</p>
               </Button>
             }
             inSheet={inSheet}
@@ -71,7 +71,7 @@ export default async function Header() {
           <SheetCloseButton
             button={
               <Button asChild size="sm" variant="outline">
-                <Link href="/sign-in">Log In</Link>
+                <Link href="/sign-in">Sign In</Link>
               </Button>
             }
             inSheet={inSheet}
