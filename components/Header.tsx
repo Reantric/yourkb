@@ -3,7 +3,13 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
 import { ThemeSwitcher } from "./ThemeSwitcher";
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from "./ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
 import { MenuIcon } from "lucide-react"; // For hamburger icon
 
 function SheetCloseButton({
@@ -48,12 +54,7 @@ export default async function Header() {
           />
           <SheetCloseButton
             button={
-              <Button
-                type="submit"
-                size="sm"
-                variant="secondary"
-                formAction={signOutAction}
-              >
+              <Button size="sm" variant="secondary" onClick={signOutAction}>
                 Log Out
               </Button>
             }
@@ -111,6 +112,7 @@ export default async function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-64">
+              <SheetTitle>Actions</SheetTitle>
               <div className="flex flex-col gap-4 mt-6">
                 {user && (
                   <p className="text-muted-foreground text-sm">
