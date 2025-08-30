@@ -3,8 +3,21 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
 import { ThemeSwitcher } from "./ThemeSwitcher";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetTrigger } from "./ui/sheet";
 import { MenuIcon } from "lucide-react"; // For hamburger icon
+
+function SheetCloseButton({
+  button,
+  inSheet,
+}: {
+  button: React.ReactNode;
+  inSheet: boolean;
+}) {
+  if (!inSheet) {
+    return button;
+  }
+  return <SheetClose asChild>{button}</SheetClose>;
+}
 
 export default async function Header() {
   const client = await createClient();
@@ -12,34 +25,60 @@ export default async function Header() {
     data: { user },
   } = await client.auth.getUser();
 
-  const NavLinks = () => (
+  // optional funciton is for closing the sidebar on click
+  const NavLinks = ({ inSheet }: { inSheet: boolean }) => (
     <>
-      <Button asChild size="sm" variant="outline">
-        <Link href="/gallery">Gallery</Link>
-      </Button>
-      {user && (
-        <Button asChild size="sm" variant="outline">
-          <Link href="/draw">Draw</Link>
-        </Button>
-      )}
-      {!user ? (
-        <>
+      <SheetCloseButton
+        button={
           <Button asChild size="sm" variant="outline">
-            <Link href="/sign-in">Login</Link>
+            <Link href="/gallery">Gallery</Link>
           </Button>
-          <Button asChild size="sm" variant="default">
-            <Link href="/sign-up">Sign Up</Link>
-          </Button>
+        }
+        inSheet={inSheet}
+      />
+      {user ? (
+        <>
+          <SheetCloseButton
+            button={
+              <Button asChild size="sm" variant="outline">
+                <Link href="/draw">Draw</Link>
+              </Button>
+            }
+            inSheet={inSheet}
+          />
+          <SheetCloseButton
+            button={
+              <Button
+                type="submit"
+                size="sm"
+                variant="secondary"
+                formAction={signOutAction}
+              >
+                Log Out
+              </Button>
+            }
+            inSheet={inSheet}
+          />
         </>
       ) : (
-        <Button
-          type="submit"
-          size="sm"
-          variant="secondary"
-          formAction={signOutAction}
-        >
-          Log Out
-        </Button>
+        <>
+          <SheetCloseButton
+            button={
+              <Button asChild size="sm" variant="outline">
+                <Link href="/sign-in">Log In</Link>
+              </Button>
+            }
+            inSheet={inSheet}
+          />
+          <SheetCloseButton
+            button={
+              <Button asChild size="sm" variant="default">
+                <Link href="/sign-up">Sign Up</Link>
+              </Button>
+            }
+            inSheet={inSheet}
+          />
+        </>
       )}
 
       <ThemeSwitcher />
@@ -60,7 +99,7 @@ export default async function Header() {
               Hey, {user.email}!
             </span>
           )}
-          <NavLinks />
+          <NavLinks inSheet={false} />
         </div>
 
         {/* Mobile Hamburger Menu */}
@@ -78,7 +117,7 @@ export default async function Header() {
                     Hey, {user.email}!
                   </p>
                 )}
-                <NavLinks />
+                <NavLinks inSheet={true} />
               </div>
             </SheetContent>
           </Sheet>
