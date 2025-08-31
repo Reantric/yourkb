@@ -41,7 +41,7 @@ export default async function ViewKilobyte({
         hexString={data[0].value}
         pixel_size={window.innerWidth <= 600 ? 3 : 5}
       />
-      <CopyLinkButton id={data[0].id}></CopyLinkButton>
+      <CopyLinkButton id={data[0].id} />
     </div>
   );
 }
