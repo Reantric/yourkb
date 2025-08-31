@@ -5,12 +5,12 @@ import CookieConsentBanner from "@/components/CookieBanner";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
-const defaultUrl = process.env.VERCEL_URL
+const DEFAULT_URL = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
 export const metadata = {
-  metadataBase: new URL(defaultUrl),
+  metadataBase: new URL(DEFAULT_URL),
   title: "YourKB",
   description: "The simplest way to make your mark on the web",
 };

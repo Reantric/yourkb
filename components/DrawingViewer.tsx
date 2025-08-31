@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 const GRID_SIZE = 64;
 
@@ -33,43 +33,46 @@ const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const binaryString = hexToBinaryString(hexString);
 
-  const canvas = canvasRef.current;
-  if (!canvas) {
-    return null;
-  }
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    return null;
-  }
-
-  const finalPixelSize = smallWindowPixelSize
-    ? window.innerWidth <= 600
+  const finalPixelSize =
+    smallWindowPixelSize && window.innerWidth <= 600
       ? smallWindowPixelSize
-      : pixelSize
-    : pixelSize;
-  const gridSize = GRID_SIZE;
+      : pixelSize;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let y = 0; y < gridSize; y++) {
-    for (let x = 0; x < gridSize; x++) {
-      const index = y * gridSize + x;
-      const bit = binaryString[index] === "1";
-      ctx.fillStyle = bit ? fgColor : bgColor;
-      ctx.fillRect(
-        x * finalPixelSize,
-        y * finalPixelSize,
-        finalPixelSize,
-        finalPixelSize,
-      );
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = GRID_SIZE * finalPixelSize;
+    canvas.height = GRID_SIZE * finalPixelSize;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        const index = y * GRID_SIZE + x;
+        const bit = binaryString[index] === "1";
+        ctx.fillStyle = bit ? fgColor : bgColor;
+        ctx.fillRect(
+          x * finalPixelSize,
+          y * finalPixelSize,
+          finalPixelSize,
+          finalPixelSize,
+        );
+      }
     }
-  }
+  }, [bgColor, fgColor, hexString, finalPixelSize]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={GRID_SIZE * finalPixelSize}
-      height={GRID_SIZE * finalPixelSize}
-    />
+    <div>
+      <canvas
+        ref={canvasRef}
+        width={GRID_SIZE * finalPixelSize}
+        height={GRID_SIZE * finalPixelSize}
+      />
+    </div>
   );
 };
 
