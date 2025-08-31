@@ -1,11 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+const AUTHENTICATED_ROUTES = ["draw", "reset-password"];
+const UNAUTHENTICATED_ROUTES = ["sign-in", "sign-up", "forgot-password"];
+
 export const updateSession = async (request: NextRequest) => {
-  // This `try/catch` block is only here for the interactive tutorial.
-  // Feel free to remove once you have Supabase connected.
   try {
-    // Create an unmodified response
     let response = NextResponse.next({
       request: {
         headers: request.headers,
@@ -39,20 +39,32 @@ export const updateSession = async (request: NextRequest) => {
     // https://supabase.com/docs/guides/auth/server-side/nextjs
     const user = await supabase.auth.getUser();
 
-    // protected routes
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
+    // protect protected routes
+    if (
+      AUTHENTICATED_ROUTES.some(
+        (route) => request.nextUrl.pathname === route,
+      ) &&
+      (!user || user.error)
+    ) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
-    // if (request.nextUrl.pathname === "/" && !user.error) {
-    //   return NextResponse.redirect(new URL("/protected", request.url));
-    // }
+    // don't allow access to these routes
+    if (
+      UNAUTHENTICATED_ROUTES.some(
+        (route) => request.nextUrl.pathname === route,
+      ) &&
+      user &&
+      !user.error
+    ) {
+      return NextResponse.redirect(new URL("/draw", request.url));
+    }
 
+    // serve the route
     return response;
   } catch (e) {
     // If you are here, a Supabase client could not be created!
-    // This is likely because you have not set up environment variables.
-    // Check out http://localhost:3000 for Next Steps.
+    console.error(e);
     return NextResponse.next({
       request: {
         headers: request.headers,
