@@ -36,10 +36,11 @@ export default async function ViewKilobyte({
   return (
     <div className="flex-1 flex flex-col space-y-1">
       <CanvasDisplay
-        fg_color={data[0].fg_color}
-        bg_color={data[0].bg_color}
+        fgColor={data[0].fg_color}
+        bgColor={data[0].bg_color}
         hexString={data[0].value}
-        pixel_size={window.innerWidth <= 600 ? 3 : 5}
+        pixelSize={5}
+        smallWindowPixelSize={3}
       />
       <CopyLinkButton id={data[0].id} />
     </div>

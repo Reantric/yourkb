@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 
 const GRID_SIZE = 64;
 
 interface CanvasDisplayProps {
-  fg_color: string;
-  bg_color: string;
+  fgColor: string;
+  bgColor: string;
   hexString: string;
-  pixel_size: number;
+  pixelSize: number;
+  smallWindowPixelSize?: number;
 }
 
 // Function to convert hex string to binary string
@@ -23,47 +24,52 @@ const hexToBinaryString = (hexString: string): string => {
 };
 
 const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
-  bg_color,
-  fg_color,
+  bgColor,
+  fgColor,
   hexString,
-  pixel_size,
+  pixelSize,
+  smallWindowPixelSize,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const binaryString = hexToBinaryString(hexString);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+  const canvas = canvasRef.current;
+  if (!canvas) {
+    return null;
+  }
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return null;
+  }
 
-    const pixelSize = pixel_size;
-    const gridSize = GRID_SIZE;
+  const finalPixelSize = smallWindowPixelSize
+    ? window.innerWidth <= 600
+      ? smallWindowPixelSize
+      : pixelSize
+    : pixelSize;
+  const gridSize = GRID_SIZE;
 
-    // Draw the grid
-    const drawGrid = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let y = 0; y < gridSize; y++) {
-        for (let x = 0; x < gridSize; x++) {
-          const index = y * gridSize + x;
-          const bit = binaryString[index] === "1";
-          ctx.fillStyle = bit ? fg_color : bg_color;
-          ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-        }
-      }
-    };
-
-    drawGrid();
-  }, [binaryString, fg_color, bg_color]);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const index = y * gridSize + x;
+      const bit = binaryString[index] === "1";
+      ctx.fillStyle = bit ? fgColor : bgColor;
+      ctx.fillRect(
+        x * finalPixelSize,
+        y * finalPixelSize,
+        finalPixelSize,
+        finalPixelSize,
+      );
+    }
+  }
 
   return (
-    <div>
-      <canvas
-        ref={canvasRef}
-        width={GRID_SIZE * pixel_size}
-        height={GRID_SIZE * pixel_size}
-      />
-    </div>
+    <canvas
+      ref={canvasRef}
+      width={GRID_SIZE * finalPixelSize}
+      height={GRID_SIZE * finalPixelSize}
+    />
   );
 };
 

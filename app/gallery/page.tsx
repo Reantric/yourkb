@@ -24,10 +24,10 @@ export default async function Gallery() {
         {data.map((item) => (
           <Link href={`/view/${item.id}`} key={item.id}>
             <CanvasDisplay
-              fg_color={item.fg_color}
-              bg_color={item.bg_color}
+              fgColor={item.fg_color}
+              bgColor={item.bg_color}
               hexString={item.value}
-              pixel_size={4}
+              pixelSize={4}
             />
           </Link>
         ))}
