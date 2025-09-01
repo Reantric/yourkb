@@ -8,10 +8,12 @@ import { hexadecimalToBitmask } from "@/lib/bits";
 
 function ColorSelectorToggleButton({
   text,
+  tooltip,
   color,
   setShowPicker,
 }: {
   text: string;
+  tooltip?: string;
   color: string;
   setShowPicker: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -24,7 +26,9 @@ function ColorSelectorToggleButton({
         className={`w-5 h-5 border-2 rounded border-foreground cursor-pointer`}
         style={{ backgroundColor: color }}
       />
-      <p className="cursor-pointer">{text}</p>
+      <p className="cursor-pointer" title={tooltip}>
+        {text}
+      </p>
     </span>
   );
 }
@@ -128,12 +132,14 @@ function Editor({
         <div className="flex flex-row gap-2 items-center">
           <div className="flex flex-col gap-1 justify-end">
             <ColorSelectorToggleButton
-              text="Pen Color"
+              text="Primary"
+              tooltip="This will be the color for the pen"
               color={fgColor}
               setShowPicker={setShowFgPicker}
             />
             <ColorSelectorToggleButton
-              text="Fill Color"
+              text="Secondary"
+              tooltip="This will be the color for the eraser"
               color={bgColor}
               setShowPicker={setShowBgPicker}
             />
