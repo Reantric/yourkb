@@ -9,13 +9,7 @@ import {
   useCallback,
 } from "react";
 import { Button } from "./ui/button";
-import {
-  bitmaskToHexadecimal,
-  clearBit,
-  getBit,
-  hexadecimalToBitmask,
-  setBit,
-} from "@/lib/bits";
+import { bitmaskToHexadecimal, clearBit, getBit, setBit } from "@/lib/bits";
 
 const DEFAULT_PIXEL_SIZE = 5;
 const SMALL_PIXEL_SIZE = 3;
@@ -27,8 +21,8 @@ export default function CanvasGrid({
   customPixelSize,
   drawing,
   setDrawing,
-  isEraser,
-  setIsEraser,
+  isSecondary,
+  isPen,
   bitmask,
   setBitmask,
 }: {
@@ -38,8 +32,8 @@ export default function CanvasGrid({
   customPixelSize?: number;
   drawing: boolean;
   setDrawing: React.Dispatch<React.SetStateAction<boolean>>;
-  isEraser: boolean;
-  setIsEraser: React.Dispatch<React.SetStateAction<boolean>>;
+  isSecondary: boolean;
+  isPen: boolean;
   bitmask: BigUint64Array;
   setBitmask: React.Dispatch<React.SetStateAction<BigUint64Array>>;
 }) {
@@ -120,18 +114,45 @@ export default function CanvasGrid({
     const index = y * GRID_SIZE + x;
     if (index < 0 || index >= GRID_SIZE * GRID_SIZE) return;
 
-    if (getBit(bitmask, index) === (isEraser ? false : true)) {
+    if (getBit(bitmask, index) === (isSecondary ? false : true)) {
       // No change needed
       return;
     }
 
+    const setNewBit = isSecondary ? clearBit : setBit;
+
     // Update bitmask with new pixel value
     const newBitmask = new BigUint64Array(bitmask);
-    if (isEraser) {
-      clearBit(newBitmask, index);
-    } else {
-      setBit(newBitmask, index);
+    if (isPen) {
+      setNewBit(newBitmask, index);
+      setBitmask(newBitmask);
+      return;
     }
+
+    // dfs to find connected pixels
+    const targetValue = getBit(bitmask, index); // what we are replacing
+    const stack: [number, number][] = [[x, y]];
+
+    while (stack.length > 0) {
+      const [cx, cy] = stack.pop()!;
+      const cIndex = cy * GRID_SIZE + cx;
+
+      // Bounds check
+      if (cx < 0 || cy < 0 || cx >= GRID_SIZE || cy >= GRID_SIZE) continue;
+
+      // Skip if this pixel isn't the target value
+      if (getBit(newBitmask, cIndex) !== targetValue) continue;
+
+      // Set to new value
+      setNewBit(newBitmask, cIndex);
+
+      // Push neighbors
+      stack.push([cx + 1, cy]);
+      stack.push([cx - 1, cy]);
+      stack.push([cx, cy + 1]);
+      stack.push([cx, cy - 1]);
+    }
+
     setBitmask(newBitmask);
   };
 
@@ -166,16 +187,6 @@ export default function CanvasGrid({
     e.preventDefault();
     if (!drawing) return;
     updatePixel(e);
-  };
-
-  // Clear canvas handler
-  const clearCanvas = () => {
-    setBitmask(hexadecimalToBitmask("0".repeat(GRID_SIZE * GRID_SIZE)));
-  };
-
-  // Toggle eraser/draw mode
-  const toggleEraser = () => {
-    setIsEraser((prev) => !prev);
   };
 
   // Save handler: send hex string of current grid state
@@ -216,18 +227,10 @@ export default function CanvasGrid({
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchEnd}
         onTouchMove={handleTouchMove}
-        style={{ touchAction: "none", imageRendering: "pixelated" }}
+        style={{ imageRendering: "pixelated" }}
       />
 
       <div className="flex flex-col space-y-2 pt-4 w-full max-w-xs">
-        <Button asChild size="sm" variant={"outline"}>
-          <button onClick={toggleEraser}>
-            {isEraser ? "Switch to Draw" : "Switch to Eraser"}
-          </button>
-        </Button>
-        <Button asChild size="sm" variant={"destructive"}>
-          <button onClick={clearCanvas}>Clear Canvas</button>
-        </Button>
         <Button asChild size="sm" variant={"outline"}>
           <button onClick={handleSave}>Save Changes</button>
         </Button>

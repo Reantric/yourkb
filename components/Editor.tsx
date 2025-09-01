@@ -5,31 +5,32 @@ import { HexColorPicker } from "react-colorful";
 import Canvas from "./Canvas";
 import { Button } from "./ui/button";
 import { hexadecimalToBitmask } from "@/lib/bits";
+import { Switch } from "./ui/switch";
+import {
+  EraserIcon,
+  PaintBucketIcon,
+  PencilLineIcon,
+  XIcon,
+} from "lucide-react";
+import { Toggle } from "./ui/toggle";
+import { Input } from "./ui/input";
 
 function ColorSelectorToggleButton({
-  text,
   tooltip,
   color,
-  setShowPicker,
+  onClick,
 }: {
-  text: string;
   tooltip?: string;
   color: string;
-  setShowPicker: React.Dispatch<React.SetStateAction<boolean>>;
+  onClick: () => void;
 }) {
   return (
-    <span
-      className="flex gap-1 items-center justify-start"
-      onClick={() => setShowPicker((prev) => !prev)}
-    >
-      <button
-        className={`w-5 h-5 border-2 rounded border-foreground cursor-pointer`}
-        style={{ backgroundColor: color }}
-      />
-      <p className="cursor-pointer" title={tooltip}>
-        {text}
-      </p>
-    </span>
+    <button
+      title={tooltip}
+      className={`w-6 h-6 border-2 rounded border-foreground cursor-pointer`}
+      style={{ backgroundColor: color }}
+      onClick={onClick}
+    />
   );
 }
 
@@ -55,10 +56,18 @@ function ColorSelectorPopover({
   return (
     <div className="fixed inset-0 z-50 w-full h-full">
       <div
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background p-4 rounded shadow-lg"
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background p-4 rounded shadow-lg items-center flex flex-col justify-center"
         ref={ref}
       >
         <HexColorPicker color={color} onChange={onChange} />
+        <Input
+          type="text"
+          value={color}
+          onChange={(e) => {
+            onChange(e.target.value);
+          }}
+          className="w-full mt-2"
+        />
         <div className="flex flex-row justify-end gap-2">
           <Button
             disabled={originalColor === color}
@@ -87,10 +96,12 @@ function Editor({
 }) {
   // drawing state
   const [drawing, setDrawing] = useState(false);
-  const [isEraser, setIsEraser] = useState(false);
-  const [binaryString, setBinaryString] = useState<BigUint64Array>(
+  const [isSecondary, setisSecondary] = useState(false);
+  const [bitmask, setBitmask] = useState<BigUint64Array>(
     hexadecimalToBitmask(initHexString),
   );
+  // tool state
+  const [isPen, setIsPen] = useState(true);
 
   // color and color selector modal state
   const [fgColor, setFgColor] = useState(initFgColor);
@@ -127,21 +138,75 @@ function Editor({
 
   return (
     <>
-      <div className="flex flex-row justify-between pb-4">
-        <div className="flex flex-row"></div>
+      {/*
+       * Actions header
+       */}
+      <div className="flex flex-row justify-between pb-4 items-center">
+        <div className="flex flex-row items-center">
+          <div className="flex flex-row gap-2 items-center">
+            <Toggle
+              pressed={isPen}
+              onPressedChange={(newState) => {
+                if (newState === false) {
+                  return;
+                }
+                setIsPen(newState);
+              }}
+              className="p-2.5"
+              title={isSecondary ? "Erase" : "Draw"}
+            >
+              {isSecondary ? (
+                <EraserIcon className="w-5 h-5" />
+              ) : (
+                <PencilLineIcon className="w-5 h-5" />
+              )}
+            </Toggle>
+            <Toggle
+              pressed={!isPen}
+              onPressedChange={(newState) => {
+                if (newState === false) {
+                  return;
+                }
+                setIsPen(!newState);
+              }}
+              className="p-2.5"
+              title="Fill"
+            >
+              <PaintBucketIcon className="w-5 h-5" />
+            </Toggle>
+            <Button
+              title="Clear Canvas"
+              className="bg-inherit hover:bg-red-600"
+              onClick={() => {
+                setBitmask(hexadecimalToBitmask("0".repeat(4096)));
+              }}
+            >
+              <XIcon className="w-5 h-5 text-foreground" />
+            </Button>
+          </div>
+        </div>
         <div className="flex flex-row gap-2 items-center">
-          <div className="flex flex-col gap-1 justify-end">
+          <div className="flex flex-row gap-2 items-center">
             <ColorSelectorToggleButton
-              text="Primary"
-              tooltip="This will be the color for the pen"
+              tooltip="This is the default color for the pen."
               color={fgColor}
-              setShowPicker={setShowFgPicker}
+              onClick={() => {
+                setShowFgPicker(true);
+                setisSecondary(false);
+              }}
+            />
+            <Switch
+              className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-foreground"
+              checked={isSecondary}
+              onCheckedChange={setisSecondary}
             />
             <ColorSelectorToggleButton
-              text="Secondary"
-              tooltip="This will be the color for the eraser"
+              tooltip="Clearing the canvas will set it to this color."
               color={bgColor}
-              setShowPicker={setShowBgPicker}
+              onClick={() => {
+                setShowBgPicker(true);
+                setisSecondary(true);
+              }}
             />
           </div>
         </div>
@@ -171,10 +236,10 @@ function Editor({
         hexString={initHexString}
         drawing={drawing}
         setDrawing={setDrawing}
-        isEraser={isEraser}
-        setIsEraser={setIsEraser}
-        bitmask={binaryString}
-        setBitmask={setBinaryString}
+        isSecondary={isSecondary}
+        isPen={isPen}
+        bitmask={bitmask}
+        setBitmask={setBitmask}
       />
     </>
   );
