@@ -208,10 +208,9 @@ export default function CanvasGrid({
         ref={canvasRef}
         width={GRID_SIZE * pixelSize}
         height={GRID_SIZE * pixelSize}
-        className="touch-none border border-gray-300"
+        className="touch-none border border-foreground"
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp} // stop drawing if mouse leaves canvas
         onMouseMove={handleMouseMove}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}

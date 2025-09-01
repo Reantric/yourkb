@@ -16,20 +16,15 @@ function ColorSelectorToggleButton({
   setShowPicker: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
-    <span style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
-      <p>{text}</p>
+    <span
+      className="flex gap-1 items-center justify-start"
+      onClick={() => setShowPicker((prev) => !prev)}
+    >
       <button
-        onClick={() => setShowPicker((prev) => !prev)}
-        style={{
-          backgroundColor: color,
-          width: "40px",
-          height: "40px",
-          border: "solid 0.25rem",
-          borderColor: "foreground",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
-      ></button>
+        className={`w-5 h-5 border-2 rounded border-foreground cursor-pointer`}
+        style={{ backgroundColor: color }}
+      />
+      <p className="cursor-pointer">{text}</p>
     </span>
   );
 }
@@ -130,18 +125,19 @@ function Editor({
     <>
       <div className="flex flex-row justify-between pb-4">
         <div className="flex flex-row"></div>
-        <div className="flex flex-row gap-2">
-          {/* Foreground Color Button */}
-          <ColorSelectorToggleButton
-            text="Pen Color"
-            color={fgColor}
-            setShowPicker={setShowFgPicker}
-          />
-          <ColorSelectorToggleButton
-            text="Fill Color"
-            color={bgColor}
-            setShowPicker={setShowBgPicker}
-          />
+        <div className="flex flex-row gap-2 items-center">
+          <div className="flex flex-col gap-1 justify-end">
+            <ColorSelectorToggleButton
+              text="Pen Color"
+              color={fgColor}
+              setShowPicker={setShowFgPicker}
+            />
+            <ColorSelectorToggleButton
+              text="Fill Color"
+              color={bgColor}
+              setShowPicker={setShowBgPicker}
+            />
+          </div>
         </div>
       </div>
 
