@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
-import CanvasGrid from "./CanvasGrid";
+import Canvas from "./Canvas";
 
 interface EditorProps {
   initFgColor: string;
@@ -168,11 +168,7 @@ const Editor: React.FC<EditorProps> = ({
         </div>
       )}
 
-      <CanvasGrid
-        fg_color={fgColor}
-        bg_color={bgColor}
-        hexString={initHexString}
-      />
+      <Canvas fgColor={fgColor} bgColor={bgColor} hexString={initHexString} />
     </>
   );
 };

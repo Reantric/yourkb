@@ -1,6 +1,6 @@
 "use client";
 
-import React, {
+import {
   useState,
   useRef,
   useEffect,
@@ -36,19 +36,17 @@ const binaryStringToHex = (binaryString: string): string => {
   return hexString;
 };
 
-interface CanvasGridProps {
-  fg_color: string;
-  bg_color: string;
-  hexString: string;
-  customPixelSize?: number;
-}
-
-const CanvasGrid: React.FC<CanvasGridProps> = ({
-  bg_color,
-  fg_color,
+export default function CanvasGrid({
+  bgColor,
+  fgColor,
   hexString,
   customPixelSize,
-}) => {
+}: {
+  fgColor: string;
+  bgColor: string;
+  hexString: string;
+  customPixelSize?: number;
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Source of truth for grid pixels
@@ -79,7 +77,7 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [customPixelSize]);
+  }, [customPixelSize, setPixelSize]);
 
   // Draw entire grid based on binaryString
   const drawGrid = useCallback(() => {
@@ -98,13 +96,13 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
       for (let x = 0; x < GRID_SIZE; x++) {
         const index = y * GRID_SIZE + x;
         const bit = binaryString[index] === "1";
-        ctx.fillStyle = bit ? fg_color : bg_color;
+        ctx.fillStyle = bit ? fgColor : bgColor;
         ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
       }
     }
-  }, [binaryString, fg_color, bg_color, pixelSize]);
+  }, [binaryString, fgColor, bgColor, pixelSize]);
 
-  // Redraw on binaryString, fg_color, bg_color, pixelSize changes
+  // Redraw on binaryString, fgColor, bgColor, pixelSize changes
   useEffect(() => {
     drawGrid();
   }, [drawGrid]);
@@ -200,8 +198,8 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          bg_color,
-          fg_color,
+          bgColor,
+          fgColor,
           value: binaryStringToHex(binaryString),
         }),
       });
@@ -217,6 +215,11 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
 
   return (
     <div id="canvas-grid-wrapper" className="flex flex-col items-center">
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row"></div>
+        <div className="flex flex-row"></div>
+      </div>
+
       <canvas
         ref={canvasRef}
         width={GRID_SIZE * pixelSize}
@@ -248,6 +251,4 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
       </div>
     </div>
   );
-};
-
-export default CanvasGrid;
+}
