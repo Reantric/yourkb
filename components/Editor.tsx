@@ -4,12 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import Canvas from "./Canvas";
 import { Button } from "./ui/button";
-
-interface EditorProps {
-  initFgColor: string;
-  initBgColor: string;
-  initHexString: string;
-}
+import { hexadecimalToBitmask } from "@/lib/bits";
 
 function ColorSelectorToggleButton({
   text,
@@ -82,16 +77,23 @@ function ColorSelectorPopover({
   );
 }
 
-const Editor: React.FC<EditorProps> = ({
+function Editor({
   initFgColor,
   initBgColor,
   initHexString,
-}) => {
+}: {
+  initFgColor: string;
+  initBgColor: string;
+  initHexString: string;
+}) {
   // drawing state
   const [drawing, setDrawing] = useState(false);
   const [isEraser, setIsEraser] = useState(false);
+  const [binaryString, setBinaryString] = useState<BigUint64Array>(
+    hexadecimalToBitmask(initHexString),
+  );
 
-  // color state
+  // color and color selector modal state
   const [fgColor, setFgColor] = useState(initFgColor);
   const [bgColor, setBgColor] = useState(initBgColor);
   const [showFgPicker, setShowFgPicker] = useState(false);
@@ -169,9 +171,11 @@ const Editor: React.FC<EditorProps> = ({
         setDrawing={setDrawing}
         isEraser={isEraser}
         setIsEraser={setIsEraser}
+        bitmask={binaryString}
+        setBitmask={setBinaryString}
       />
     </>
   );
-};
+}
 
 export default Editor;

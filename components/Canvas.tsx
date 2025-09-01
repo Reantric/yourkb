@@ -9,42 +9,28 @@ import {
   useCallback,
 } from "react";
 import { Button } from "./ui/button";
+import {
+  bitmaskToHexadecimal,
+  clearBit,
+  getBit,
+  hexadecimalToBitmask,
+  setBit,
+} from "@/lib/bits";
 
 const DEFAULT_PIXEL_SIZE = 5;
 const SMALL_PIXEL_SIZE = 3;
 const GRID_SIZE = 64;
 
-// Convert hex string to binary string
-const hexToBinaryString = (hexString: string): string => {
-  let binaryString = "";
-  for (let i = 0; i < hexString.length; i += 2) {
-    const hexPair = hexString.slice(i, i + 2);
-    const binaryOctet = parseInt(hexPair, 16).toString(2).padStart(8, "0");
-    binaryString += binaryOctet;
-  }
-  return binaryString;
-};
-
-// Convert binary string to hex string
-const binaryStringToHex = (binaryString: string): string => {
-  let hexString = "";
-  for (let i = 0; i < binaryString.length; i += 8) {
-    const binaryOctet = binaryString.slice(i, i + 8);
-    const hexPair = parseInt(binaryOctet, 2).toString(16).padStart(2, "0");
-    hexString += hexPair;
-  }
-  return hexString;
-};
-
 export default function CanvasGrid({
   bgColor,
   fgColor,
-  hexString,
   customPixelSize,
   drawing,
   setDrawing,
   isEraser,
   setIsEraser,
+  bitmask,
+  setBitmask,
 }: {
   fgColor: string;
   bgColor: string;
@@ -54,13 +40,10 @@ export default function CanvasGrid({
   setDrawing: React.Dispatch<React.SetStateAction<boolean>>;
   isEraser: boolean;
   setIsEraser: React.Dispatch<React.SetStateAction<boolean>>;
+  bitmask: BigUint64Array;
+  setBitmask: React.Dispatch<React.SetStateAction<BigUint64Array>>;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  // Source of truth for grid pixels
-  const [binaryString, setBinaryString] = useState<string>(
-    hexToBinaryString(hexString),
-  );
 
   // Responsive pixel size state
   const [pixelSize, setPixelSize] = useState<number>(
@@ -83,14 +66,12 @@ export default function CanvasGrid({
     return () => window.removeEventListener("resize", handleResize);
   }, [customPixelSize, setPixelSize]);
 
-  // Draw entire grid based on binaryString
   const drawGrid = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Resize canvas based on pixelSize
     canvas.width = GRID_SIZE * pixelSize;
     canvas.height = GRID_SIZE * pixelSize;
 
@@ -99,12 +80,12 @@ export default function CanvasGrid({
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         const index = y * GRID_SIZE + x;
-        const bit = binaryString[index] === "1";
+        const bit = getBit(bitmask, index); // ✅ use bitmask instead of binaryString
         ctx.fillStyle = bit ? fgColor : bgColor;
         ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
       }
     }
-  }, [binaryString, fgColor, bgColor, pixelSize]);
+  }, [bitmask, fgColor, bgColor, pixelSize]);
 
   // Redraw on binaryString, fgColor, bgColor, pixelSize changes
   useEffect(() => {
@@ -137,17 +118,21 @@ export default function CanvasGrid({
   ) => {
     const { x, y } = getMouseOrTouchPosition(e);
     const index = y * GRID_SIZE + x;
-    if (index < 0 || index >= binaryString.length) return;
+    if (index < 0 || index >= GRID_SIZE * GRID_SIZE) return;
 
-    if (binaryString[index] === (isEraser ? "0" : "1")) {
+    if (getBit(bitmask, index) === (isEraser ? false : true)) {
       // No change needed
       return;
     }
 
-    // Update binary string with new pixel value
-    const newBinaryArray = binaryString.split("");
-    newBinaryArray[index] = isEraser ? "0" : "1";
-    setBinaryString(newBinaryArray.join(""));
+    // Update bitmask with new pixel value
+    const newBitmask = new BigUint64Array(bitmask);
+    if (isEraser) {
+      clearBit(newBitmask, index);
+    } else {
+      setBit(newBitmask, index);
+    }
+    setBitmask(newBitmask);
   };
 
   // Mouse and touch event handlers
@@ -185,7 +170,7 @@ export default function CanvasGrid({
 
   // Clear canvas handler
   const clearCanvas = () => {
-    setBinaryString("0".repeat(GRID_SIZE * GRID_SIZE));
+    setBitmask(hexadecimalToBitmask("0".repeat(GRID_SIZE * GRID_SIZE)));
   };
 
   // Toggle eraser/draw mode
@@ -204,7 +189,7 @@ export default function CanvasGrid({
         body: JSON.stringify({
           bgColor,
           fgColor,
-          value: binaryStringToHex(binaryString),
+          value: bitmaskToHexadecimal(bitmask),
         }),
       });
 
