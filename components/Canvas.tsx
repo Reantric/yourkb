@@ -41,11 +41,19 @@ export default function CanvasGrid({
   fgColor,
   hexString,
   customPixelSize,
+  drawing,
+  setDrawing,
+  isEraser,
+  setIsEraser,
 }: {
   fgColor: string;
   bgColor: string;
   hexString: string;
   customPixelSize?: number;
+  drawing: boolean;
+  setDrawing: React.Dispatch<React.SetStateAction<boolean>>;
+  isEraser: boolean;
+  setIsEraser: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -53,10 +61,6 @@ export default function CanvasGrid({
   const [binaryString, setBinaryString] = useState<string>(
     hexToBinaryString(hexString),
   );
-
-  // Drawing mode state
-  const [drawing, setDrawing] = useState(false);
-  const [isEraser, setIsEraser] = useState(false);
 
   // Responsive pixel size state
   const [pixelSize, setPixelSize] = useState<number>(
@@ -215,11 +219,6 @@ export default function CanvasGrid({
 
   return (
     <div id="canvas-grid-wrapper" className="flex flex-col items-center">
-      <div className="flex flex-row justify-between">
-        <div className="flex flex-row"></div>
-        <div className="flex flex-row"></div>
-      </div>
-
       <canvas
         ref={canvasRef}
         width={GRID_SIZE * pixelSize}
