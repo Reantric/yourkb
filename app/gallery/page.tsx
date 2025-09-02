@@ -7,7 +7,11 @@ import Link from "next/link";
 export default async function Gallery() {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.from("kilobytes").select().limit(100);
+  const { data, error } = await supabase
+    .from("kilobytes")
+    .select()
+    .eq("hidden", false)
+    .limit(100);
 
   if (error) {
     console.error(error);

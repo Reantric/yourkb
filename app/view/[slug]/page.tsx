@@ -1,3 +1,4 @@
+import { isCurrentUserAdmin } from "@/app/actions";
 import Viewer from "@/components/Viewer";
 
 import { createClient } from "@/utils/supabase/server";
@@ -10,6 +11,8 @@ export default async function ViewKilobyte({
   const { slug } = await params;
 
   const supabase = await createClient();
+
+  const isAdmin = await isCurrentUserAdmin();
 
   // not sure what protections supabase has against sql injection, so validate here
   const desiredImageId = Number.parseInt(slug);
@@ -28,7 +31,7 @@ export default async function ViewKilobyte({
     );
   }
 
-  if (data.length === 0) {
+  if (data.length === 0 || (data[0].hidden && !isAdmin)) {
     return <p>This kilobyte seems to be missing.</p>;
   }
 
@@ -40,6 +43,8 @@ export default async function ViewKilobyte({
       hexString={data[0].value}
       pixelSize={5}
       smallWindowPixelSize={3}
+      isAdmin={isAdmin}
+      isHidden={data[0].hidden}
     />
   );
 }
