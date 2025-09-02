@@ -8,8 +8,7 @@ import {
   TouchEvent,
   useCallback,
 } from "react";
-import { Button } from "./ui/button";
-import { bitmaskToHexadecimal, clearBit, getBit, setBit } from "@/lib/bits";
+import { clearBit, getBit, setBit } from "@/lib/bits";
 
 const DEFAULT_PIXEL_SIZE = 5;
 const SMALL_PIXEL_SIZE = 3;
@@ -25,6 +24,7 @@ export default function CanvasGrid({
   isPen,
   bitmask,
   setBitmask,
+  checkpointStateBeforeNewAction,
 }: {
   fgColor: string;
   bgColor: string;
@@ -36,6 +36,7 @@ export default function CanvasGrid({
   isPen: boolean;
   bitmask: BigUint64Array;
   setBitmask: React.Dispatch<React.SetStateAction<BigUint64Array>>;
+  checkpointStateBeforeNewAction: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -160,6 +161,7 @@ export default function CanvasGrid({
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     setDrawing(true);
+    checkpointStateBeforeNewAction();
     updatePixel(e);
   };
 
@@ -175,6 +177,7 @@ export default function CanvasGrid({
   const handleTouchStart = (e: TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     setDrawing(true);
+    checkpointStateBeforeNewAction();
     updatePixel(e);
   };
 
@@ -187,30 +190,6 @@ export default function CanvasGrid({
     e.preventDefault();
     if (!drawing) return;
     updatePixel(e);
-  };
-
-  // Save handler: send hex string of current grid state
-  const handleSave = async () => {
-    try {
-      const response = await fetch("/api/updatekb", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          bgColor,
-          fgColor,
-          value: bitmaskToHexadecimal(bitmask),
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to save changes");
-
-      const data = await response.json();
-      console.log("Save successful:", data);
-    } catch (error) {
-      console.error("Error saving changes:", error);
-    }
   };
 
   return (
@@ -229,12 +208,6 @@ export default function CanvasGrid({
         onTouchMove={handleTouchMove}
         style={{ imageRendering: "pixelated" }}
       />
-
-      <div className="flex flex-col space-y-2 pt-4 w-full max-w-xs">
-        <Button asChild size="sm" variant={"outline"}>
-          <button onClick={handleSave}>Save Changes</button>
-        </Button>
-      </div>
     </div>
   );
 }

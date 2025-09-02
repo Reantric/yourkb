@@ -4,16 +4,21 @@ import React, { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import Canvas from "./Canvas";
 import { Button } from "./ui/button";
-import { hexadecimalToBitmask } from "@/lib/bits";
+import { bitmaskToHexadecimal, hexadecimalToBitmask } from "@/lib/bits";
 import { Switch } from "./ui/switch";
 import {
   EraserIcon,
   PaintBucketIcon,
   PencilLineIcon,
+  RedoIcon,
+  SaveIcon,
+  UndoIcon,
   XIcon,
 } from "lucide-react";
 import { Toggle } from "./ui/toggle";
 import { Input } from "./ui/input";
+import { useToast } from "./hooks/use-toast";
+import { Toaster } from "./ui/toaster";
 
 function ColorSelectorToggleButton({
   tooltip,
@@ -100,6 +105,34 @@ function Editor({
   const [bitmask, setBitmask] = useState<BigUint64Array>(
     hexadecimalToBitmask(initHexString),
   );
+  const [latestStates, setLatestStates] = useState<BigUint64Array[]>([]);
+  const [futureStates, setFutureStates] = useState<BigUint64Array[]>([]);
+
+  const { toast } = useToast();
+
+  const checkpointStateBeforeNewAction = () => {
+    setLatestStates((prev) => [...prev, bitmask]);
+    setFutureStates([]); // clear future states on new action
+  };
+
+  const undo = () => {
+    if (latestStates.length === 0) {
+      return;
+    }
+    setFutureStates((prev) => [...prev, bitmask]);
+    setBitmask(latestStates[latestStates.length - 1]);
+    setLatestStates((prev) => prev.slice(0, -1));
+  };
+
+  const redo = () => {
+    if (futureStates.length === 0) {
+      return;
+    }
+    setLatestStates((prev) => [...prev, bitmask]);
+    setBitmask(futureStates[futureStates.length - 1]);
+    setFutureStates((prev) => prev.slice(0, -1));
+  };
+
   // tool state
   const [isPen, setIsPen] = useState(true);
 
@@ -129,6 +162,27 @@ function Editor({
     }
   };
 
+  // Save handler: send hex string of current grid state
+  const handleSave = async () => {
+    const response = await fetch("/api/updatekb", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        bgColor,
+        fgColor,
+        value: bitmaskToHexadecimal(bitmask),
+      }),
+    });
+
+    if (!response.ok) {
+      toast({ title: "Failed to save changes", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Changes saved successfully!", variant: "success" });
+  };
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -141,7 +195,34 @@ function Editor({
       {/*
        * Actions header
        */}
-      <div className="flex flex-row justify-between pb-4 items-center">
+
+      <div className="flex flex-row justify-between pb-2 items-center">
+        <div className="flex flex-row items-center gap-2">
+          <Button
+            className="p-2.5"
+            variant="secondary"
+            disabled={latestStates.length === 0}
+            onClick={undo}
+          >
+            <UndoIcon className="w-5 h-5" />
+          </Button>
+          <Button
+            className="p-2.5"
+            variant="secondary"
+            disabled={futureStates.length === 0}
+            onClick={redo}
+          >
+            <RedoIcon className="w-5 h-5" />
+          </Button>
+        </div>
+        <div className="flex flex-row items-center">
+          <Button onClick={handleSave} className="p-2.5 bg-blue-500">
+            <SaveIcon className="w-5 h-5" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-row justify-between pb-2 items-center">
         <div className="flex flex-row items-center">
           <div className="flex flex-row gap-2 items-center">
             <Toggle
@@ -176,9 +257,11 @@ function Editor({
             </Toggle>
             <Button
               title="Clear Canvas"
-              className="bg-inherit hover:bg-red-600"
+              className="p-2.5"
+              variant="destructive"
               onClick={() => {
-                setBitmask(hexadecimalToBitmask("0".repeat(4096)));
+                checkpointStateBeforeNewAction();
+                setBitmask(new BigUint64Array(64));
               }}
             >
               <XIcon className="w-5 h-5 text-foreground" />
@@ -229,6 +312,7 @@ function Editor({
         showSelector={showBgPicker}
         ref={bgPickerRef}
       />
+      <Toaster />
 
       <Canvas
         fgColor={fgColor}
@@ -240,6 +324,7 @@ function Editor({
         isPen={isPen}
         bitmask={bitmask}
         setBitmask={setBitmask}
+        checkpointStateBeforeNewAction={checkpointStateBeforeNewAction}
       />
     </>
   );
