@@ -190,6 +190,33 @@ function Editor({
     };
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+      const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey;
+
+      if (ctrlOrCmd && event.key === "z") {
+        // Undo (Ctrl+Z or Cmd+Z)
+        event.preventDefault();
+        if (event.shiftKey) {
+          // Redo (Ctrl+Shift+Z or Cmd+Shift+Z)
+          redo();
+        } else {
+          undo();
+        }
+      } else if (ctrlOrCmd && event.key === "y") {
+        // Redo (Ctrl+Y)
+        event.preventDefault();
+        redo();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [undo, redo]);
+
   return (
     <>
       {/*
