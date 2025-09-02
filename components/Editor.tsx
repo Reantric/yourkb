@@ -262,6 +262,7 @@ function Editor({
             variant="secondary"
             disabled={latestStates.length === 0}
             onClick={undo}
+            title="Undo"
           >
             <UndoIcon className="w-5 h-5" />
           </Button>
@@ -270,13 +271,18 @@ function Editor({
             variant="secondary"
             disabled={futureStates.length === 0}
             onClick={redo}
+            title="Redo"
           >
             <RedoIcon className="w-5 h-5" />
           </Button>
         </div>
         <div className="flex flex-row items-center gap-2">
           <CopyLinkButton id={imageId} compact={true} />
-          <Button onClick={handleSave} className="p-2.5 bg-blue-500">
+          <Button
+            onClick={handleSave}
+            className="p-2.5 bg-blue-500"
+            title="Save"
+          >
             <SaveIcon className="w-5 h-5" />
           </Button>
         </div>
