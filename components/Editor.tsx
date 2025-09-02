@@ -21,6 +21,7 @@ import { Input } from "./ui/input";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./ui/toaster";
 import CopyLinkButton from "./LinkButton";
+import { useRouter } from "next/navigation";
 
 function ColorSelectorToggleButton({
   tooltip,
@@ -115,6 +116,8 @@ function Editor({
 
   const { toast } = useToast();
 
+  const { refresh } = useRouter();
+
   const checkpointStateBeforeNewAction = () => {
     setLatestStates((prev) => [...prev, bitmask]);
     setFutureStates([]); // clear future states on new action
@@ -181,23 +184,32 @@ function Editor({
 
   // Save handler: send hex string of current grid state
   const handleSave = async () => {
-    const response = await fetch("/api/updatekb", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        bgColor,
-        fgColor,
-        value: bitmaskToHexadecimal(bitmask),
-      }),
-    });
+    try {
+      const response = await fetch("/api/updatekb", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bgColor,
+          fgColor,
+          value: bitmaskToHexadecimal(bitmask),
+        }),
+      });
 
-    if (!response.ok) {
-      toast({ title: "Failed to save changes", variant: "destructive" });
-      return;
+      if (!response.ok) {
+        toast({ title: "Failed to save changes", variant: "destructive" });
+        return;
+      }
+      toast({ title: "Changes saved successfully!", variant: "success" });
+      refresh();
+    } catch (error: unknown) {
+      toast({
+        title: "Failed to save changes",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
     }
-    toast({ title: "Changes saved successfully!", variant: "success" });
   };
 
   useEffect(() => {
@@ -233,6 +245,20 @@ function Editor({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [undo, redo]);
+
+  // alert the user about unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (initHexString !== bitmaskToHexadecimal(bitmask)) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [initHexString, bitmask]);
 
   return (
     <>
@@ -306,6 +332,7 @@ function Editor({
             className="p-2.5 bg-blue-500"
             title="Save"
             variant="outline"
+            disabled={initHexString === bitmaskToHexadecimal(bitmask)}
           >
             <SaveIcon className="w-5 h-5" />
           </Button>
