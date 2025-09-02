@@ -149,3 +149,18 @@ export const isCurrentUserAdmin = async () => {
 
   return data && data.length > 0;
 };
+
+export const signInWithGoogle = async () => {
+  const origin = (await headers()).get("origin");
+  const supabase = await createClient();
+  const { data } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+    },
+  });
+
+  if (data.url) {
+    redirect(data.url);
+  }
+};

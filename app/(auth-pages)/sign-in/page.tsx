@@ -1,5 +1,6 @@
 import { signInAction } from "@/app/actions";
 import { FormMessage, Message } from "@/components/FormMessage";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,6 +51,7 @@ export default async function Login({
           Sign in
         </SubmitButton>
         <FormMessage message={message} />
+        <GoogleSignInButton />
       </div>
     </form>
   );

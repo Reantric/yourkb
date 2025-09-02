@@ -62,8 +62,9 @@ export default function InternalHeader({ user }: { user: User | null }) {
                 size="sm"
                 variant="outline"
                 onClick={signOutAction}
+                type="button"
               >
-                <p>Sign Out</p>
+                <p className="cursor-pointer">Sign Out</p>
               </Button>
             }
             inSheet={inSheet}
