@@ -30,6 +30,7 @@ export default function CopyLinkButton({
         onClick={handleCopyLink}
         className={cn(className, "p-2.5")}
         title="Copy Sharing Link"
+        variant="outline"
       >
         <LinkIcon className="w-5 h-5" />
       </Button>

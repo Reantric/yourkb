@@ -274,7 +274,7 @@ function Editor({
         <div className="flex flex-row items-center gap-2">
           <Button
             className="p-2.5"
-            variant="secondary"
+            variant="outline"
             disabled={latestStates.length === 0}
             onClick={undo}
             title="Undo"
@@ -283,7 +283,7 @@ function Editor({
           </Button>
           <Button
             className="p-2.5"
-            variant="secondary"
+            variant="outline"
             disabled={futureStates.length === 0}
             onClick={redo}
             title="Redo"
@@ -296,6 +296,7 @@ function Editor({
             onClick={copyCanvasToClipboard}
             className="p-2.5"
             title="Copy Drawing"
+            variant="outline"
           >
             <CopyIcon className="w-5 h-5" />
           </Button>
@@ -304,6 +305,7 @@ function Editor({
             onClick={handleSave}
             className="p-2.5 bg-blue-500"
             title="Save"
+            variant="outline"
           >
             <SaveIcon className="w-5 h-5" />
           </Button>
@@ -314,6 +316,7 @@ function Editor({
         <div className="flex flex-row items-center">
           <div className="flex flex-row gap-2 items-center">
             <Toggle
+              variant="outline"
               pressed={isPen}
               onPressedChange={(newState) => {
                 if (newState === false) {
@@ -321,7 +324,7 @@ function Editor({
                 }
                 setIsPen(newState);
               }}
-              className="p-2.5"
+              className="p-2.5 hover:bg-gray-300 data-[state=on]:bg-gray-400 dark:hover:bg-gray-700 dark:data-[state=on]:bg-gray-600"
               title={isSecondary ? "Erase" : "Draw"}
             >
               {isSecondary ? (
@@ -331,6 +334,7 @@ function Editor({
               )}
             </Toggle>
             <Toggle
+              variant="outline"
               pressed={!isPen}
               onPressedChange={(newState) => {
                 if (newState === false) {
@@ -338,7 +342,7 @@ function Editor({
                 }
                 setIsPen(!newState);
               }}
-              className="p-2.5"
+              className="p-2.5 hover:bg-gray-300 data-[state=on]:bg-gray-400 dark:hover:bg-gray-700 dark:data-[state=on]:bg-gray-600"
               title="Fill"
             >
               <PaintBucketIcon className="w-5 h-5" />
@@ -352,7 +356,7 @@ function Editor({
                 setBitmask(new BigUint64Array(64));
               }}
             >
-              <XIcon className="w-5 h-5 text-foreground" />
+              <XIcon className="w-5 h-5" />
             </Button>
           </div>
         </div>

@@ -129,6 +129,7 @@ export default function CanvasDisplay({
           className="p-2.5"
           title="Copy Drawing"
           onClick={copyCanvasToClipboard}
+          variant="outline"
         >
           <CopyIcon className="w-5 h-5" />
         </Button>
@@ -143,6 +144,7 @@ export default function CanvasDisplay({
               url: window.location.href,
             });
           }}
+          variant="outline"
         >
           <Share2Icon className="w-5 h-5" />
         </Button>
