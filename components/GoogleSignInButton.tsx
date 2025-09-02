@@ -3,10 +3,10 @@
 import { Button } from "./ui/button";
 import { signInWithGoogle } from "@/app/actions";
 
-export default function GoogleSignInButton() {
+export default function GoogleSignInButton({ text }: { text: string }) {
   return (
     <Button variant="link" onClick={signInWithGoogle}>
-      Sign in with Google
+      {text}
     </Button>
   );
 }
