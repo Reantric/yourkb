@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import CopyLinkButton from "./LinkButton";
 import { Toaster } from "./ui/toaster";
-import { CopyIcon, Share2Icon } from "lucide-react";
+import { CopyIcon, EyeIcon, EyeOffIcon, Share2Icon } from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "./hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const GRID_SIZE = 64;
 
@@ -28,6 +29,8 @@ export default function CanvasDisplay({
   pixelSize,
   smallWindowPixelSize,
   imageOnly,
+  isAdmin,
+  isHidden,
 }: {
   id: number;
   fgColor: string;
@@ -36,17 +39,27 @@ export default function CanvasDisplay({
   pixelSize: number;
   smallWindowPixelSize?: number;
   imageOnly?: boolean;
+  isAdmin?: boolean;
+  isHidden?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const { refresh } = useRouter();
 
   const { toast } = useToast();
 
   const binaryString = hexToBinaryString(hexString);
 
-  const finalPixelSize =
-    smallWindowPixelSize && window.innerWidth <= 600
-      ? smallWindowPixelSize
-      : pixelSize;
+  // for some reason I can't get window here
+  const [finalPixelSize, setFinalPixelSize] = useState(pixelSize);
+
+  useEffect(() => {
+    const newFinalPixelSize =
+      smallWindowPixelSize && window.innerWidth <= 600
+        ? smallWindowPixelSize
+        : pixelSize;
+    setFinalPixelSize(newFinalPixelSize);
+  }, [smallWindowPixelSize, pixelSize]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -74,6 +87,37 @@ export default function CanvasDisplay({
       }
     }
   }, [bgColor, fgColor, hexString, finalPixelSize]);
+
+  const setNewVisibility = async () => {
+    if (!isAdmin) return;
+
+    const response = await fetch(`/api/changevisibility`, {
+      method: "POST",
+      body: JSON.stringify({
+        id,
+        newVisibility: !isHidden,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      toast({
+        title: "Error hiding kilobyte",
+        variant: "destructive",
+        description: (await response.json()).error,
+      });
+      return;
+    }
+
+    toast({
+      title: "Kilobyte hidden",
+      variant: "success",
+      description: "This kilobyte has been successfully hidden.",
+    });
+    refresh();
+  };
 
   const copyCanvasToClipboard = async () => {
     if (!canvasRef.current) return;
@@ -125,6 +169,19 @@ export default function CanvasDisplay({
         />
       </div>
       <div className="flex flex-row justify-end gap-2">
+        {isAdmin && (
+          <Button
+            onClick={setNewVisibility}
+            variant={isHidden ? "default" : "destructive"}
+            title={isHidden ? "Unhide Kilobyte" : "Hide Kilobyte"}
+          >
+            {isHidden ? (
+              <EyeIcon className="w-5 h-5" />
+            ) : (
+              <EyeOffIcon className="w-5 h-5" />
+            )}
+          </Button>
+        )}
         <Button
           className="p-2.5"
           title="Copy Drawing"

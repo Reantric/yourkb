@@ -125,3 +125,42 @@ export const signOutAction = async () => {
   await supabase.auth.signOut();
   return redirect("/");
 };
+
+export const isCurrentUserAdmin = async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return false;
+  }
+
+  const { data, error } = await supabase
+    .from("permissions")
+    .select()
+    .eq("uid", user.id)
+    .eq("permission", "admin");
+
+  if (error) {
+    console.error(error);
+    return false;
+  }
+
+  return data && data.length > 0;
+};
+
+export const signInWithGoogle = async () => {
+  const origin = (await headers()).get("origin");
+  const supabase = await createClient();
+  const { data } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+    },
+  });
+
+  if (data.url) {
+    redirect(data.url);
+  }
+};
