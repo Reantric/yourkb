@@ -19,6 +19,7 @@ import { Toggle } from "./ui/toggle";
 import { Input } from "./ui/input";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./ui/toaster";
+import CopyLinkButton from "./DrawingLink";
 
 function ColorSelectorToggleButton({
   tooltip,
@@ -91,10 +92,12 @@ function ColorSelectorPopover({
 }
 
 function Editor({
+  imageId,
   initFgColor,
   initBgColor,
   initHexString,
 }: {
+  imageId: number;
   initFgColor: string;
   initBgColor: string;
   initHexString: string;
@@ -219,11 +222,40 @@ function Editor({
 
   return (
     <>
-      {/*
-       * Actions header
-       */}
+      {/* Overlay */}
+      <ColorSelectorPopover
+        color={fgColor}
+        originalColor={initFgColor}
+        onChange={setFgColor}
+        onClose={() => setShowFgPicker(false)}
+        showSelector={showFgPicker}
+        ref={fgPickerRef}
+      />
+      <ColorSelectorPopover
+        color={bgColor}
+        originalColor={initBgColor}
+        onChange={setBgColor}
+        onClose={() => setShowBgPicker(false)}
+        showSelector={showBgPicker}
+        ref={bgPickerRef}
+      />
+      <Toaster />
 
-      <div className="flex flex-row justify-between pb-2 items-center">
+      <Canvas
+        fgColor={fgColor}
+        bgColor={bgColor}
+        hexString={initHexString}
+        drawing={drawing}
+        setDrawing={setDrawing}
+        isSecondary={isSecondary}
+        isPen={isPen}
+        bitmask={bitmask}
+        setBitmask={setBitmask}
+        checkpointStateBeforeNewAction={checkpointStateBeforeNewAction}
+      />
+
+      {/* Actions footer menu */}
+      <div className="flex flex-row justify-between pt-2 items-center">
         <div className="flex flex-row items-center gap-2">
           <Button
             className="p-2.5"
@@ -242,14 +274,15 @@ function Editor({
             <RedoIcon className="w-5 h-5" />
           </Button>
         </div>
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center gap-2">
+          <CopyLinkButton id={imageId} compact={true} />
           <Button onClick={handleSave} className="p-2.5 bg-blue-500">
             <SaveIcon className="w-5 h-5" />
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-row justify-between pb-2 items-center">
+      <div className="flex flex-row justify-between pt-2 items-center">
         <div className="flex flex-row items-center">
           <div className="flex flex-row gap-2 items-center">
             <Toggle
@@ -321,38 +354,6 @@ function Editor({
           </div>
         </div>
       </div>
-
-      {/* Overlay */}
-      <ColorSelectorPopover
-        color={fgColor}
-        originalColor={initFgColor}
-        onChange={setFgColor}
-        onClose={() => setShowFgPicker(false)}
-        showSelector={showFgPicker}
-        ref={fgPickerRef}
-      />
-      <ColorSelectorPopover
-        color={bgColor}
-        originalColor={initBgColor}
-        onChange={setBgColor}
-        onClose={() => setShowBgPicker(false)}
-        showSelector={showBgPicker}
-        ref={bgPickerRef}
-      />
-      <Toaster />
-
-      <Canvas
-        fgColor={fgColor}
-        bgColor={bgColor}
-        hexString={initHexString}
-        drawing={drawing}
-        setDrawing={setDrawing}
-        isSecondary={isSecondary}
-        isPen={isPen}
-        bitmask={bitmask}
-        setBitmask={setBitmask}
-        checkpointStateBeforeNewAction={checkpointStateBeforeNewAction}
-      />
     </>
   );
 }

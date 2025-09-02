@@ -1,5 +1,6 @@
 import CopyLinkButton from "@/components/DrawingLink";
 import CanvasDisplay from "@/components/DrawingViewer";
+import { Toaster } from "@/components/ui/toaster";
 
 import { createClient } from "@/utils/supabase/server";
 
@@ -43,6 +44,7 @@ export default async function ViewKilobyte({
         smallWindowPixelSize={3}
       />
       <CopyLinkButton id={data[0].id} />
+      <Toaster />
     </div>
   );
 }

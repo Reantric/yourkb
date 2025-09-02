@@ -1,7 +1,6 @@
 import Editor from "@/components/Editor";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import CopyLinkButton from "@/components/DrawingLink";
 
 const DEFAULT_BG = "#ffffff";
 const DEFAULT_FG = "#000000";
@@ -74,11 +73,11 @@ export default async function ProtectedPage() {
     <div className="flex-1 w-full flex flex-col">
       <h1 className="text-4xl pb-6">Your Kilobyte</h1>
       <Editor
+        imageId={id}
         initBgColor={bg_color}
         initFgColor={fg_color}
         initHexString={value}
       />
-      <CopyLinkButton id={id} />
     </div>
   );
 }
