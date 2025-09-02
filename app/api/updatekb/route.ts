@@ -10,16 +10,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Permission denied" }, { status: 401 });
   }
 
-  const { bg_color, fg_color, value } = await req.json();
-  if (!bg_color || !fg_color || !value) {
+  const { bgColor, fgColor, value } = await req.json();
+  if (!bgColor || !fgColor || !value) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
   const { error } = await supabase
     .from("kilobytes")
     .update({
-      fg_color: fg_color,
-      bg_color: bg_color,
+      fg_color: fgColor,
+      bg_color: bgColor,
       value: value,
     })
     .eq("user_id", user.id);

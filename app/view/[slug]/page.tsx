@@ -1,5 +1,4 @@
-import CopyLinkButton from "@/components/DrawingLink";
-import CanvasDisplay from "@/components/DrawingViewer";
+import Viewer from "@/components/Viewer";
 
 import { createClient } from "@/utils/supabase/server";
 
@@ -34,15 +33,13 @@ export default async function ViewKilobyte({
   }
 
   return (
-    <div className="flex-1 flex flex-col space-y-1">
-      <CanvasDisplay
-        fgColor={data[0].fg_color}
-        bgColor={data[0].bg_color}
-        hexString={data[0].value}
-        pixelSize={5}
-        smallWindowPixelSize={3}
-      />
-      <CopyLinkButton id={data[0].id} />
-    </div>
+    <Viewer
+      id={data[0].id}
+      fgColor={data[0].fg_color}
+      bgColor={data[0].bg_color}
+      hexString={data[0].value}
+      pixelSize={5}
+      smallWindowPixelSize={3}
+    />
   );
 }

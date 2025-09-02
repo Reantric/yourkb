@@ -1,65 +1,44 @@
 "use client";
 
-import React, {
+import {
   useState,
-  useRef,
   useEffect,
   MouseEvent,
   TouchEvent,
   useCallback,
 } from "react";
-import { Button } from "./ui/button";
+import { clearBit, getBit, setBit } from "@/lib/bits";
 
 const DEFAULT_PIXEL_SIZE = 5;
 const SMALL_PIXEL_SIZE = 3;
 const GRID_SIZE = 64;
 
-// Convert hex string to binary string
-const hexToBinaryString = (hexString: string): string => {
-  let binaryString = "";
-  for (let i = 0; i < hexString.length; i += 2) {
-    const hexPair = hexString.slice(i, i + 2);
-    const binaryOctet = parseInt(hexPair, 16).toString(2).padStart(8, "0");
-    binaryString += binaryOctet;
-  }
-  return binaryString;
-};
-
-// Convert binary string to hex string
-const binaryStringToHex = (binaryString: string): string => {
-  let hexString = "";
-  for (let i = 0; i < binaryString.length; i += 8) {
-    const binaryOctet = binaryString.slice(i, i + 8);
-    const hexPair = parseInt(binaryOctet, 2).toString(16).padStart(2, "0");
-    hexString += hexPair;
-  }
-  return hexString;
-};
-
-interface CanvasGridProps {
-  fg_color: string;
-  bg_color: string;
+export default function CanvasGrid({
+  bgColor,
+  fgColor,
+  customPixelSize,
+  drawing,
+  setDrawing,
+  isSecondary,
+  isPen,
+  bitmask,
+  setBitmask,
+  checkpointStateBeforeNewAction,
+  canvasRef,
+}: {
+  fgColor: string;
+  bgColor: string;
   hexString: string;
   customPixelSize?: number;
-}
-
-const CanvasGrid: React.FC<CanvasGridProps> = ({
-  bg_color,
-  fg_color,
-  hexString,
-  customPixelSize,
-}) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  // Source of truth for grid pixels
-  const [binaryString, setBinaryString] = useState<string>(
-    hexToBinaryString(hexString),
-  );
-
-  // Drawing mode state
-  const [drawing, setDrawing] = useState(false);
-  const [isEraser, setIsEraser] = useState(false);
-
+  drawing: boolean;
+  setDrawing: React.Dispatch<React.SetStateAction<boolean>>;
+  isSecondary: boolean;
+  isPen: boolean;
+  bitmask: BigUint64Array;
+  setBitmask: React.Dispatch<React.SetStateAction<BigUint64Array>>;
+  checkpointStateBeforeNewAction: () => void;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+}) {
   // Responsive pixel size state
   const [pixelSize, setPixelSize] = useState<number>(
     customPixelSize || DEFAULT_PIXEL_SIZE,
@@ -79,16 +58,14 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [customPixelSize]);
+  }, [customPixelSize, setPixelSize]);
 
-  // Draw entire grid based on binaryString
   const drawGrid = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Resize canvas based on pixelSize
     canvas.width = GRID_SIZE * pixelSize;
     canvas.height = GRID_SIZE * pixelSize;
 
@@ -97,14 +74,14 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         const index = y * GRID_SIZE + x;
-        const bit = binaryString[index] === "1";
-        ctx.fillStyle = bit ? fg_color : bg_color;
+        const bit = getBit(bitmask, index); // ✅ use bitmask instead of binaryString
+        ctx.fillStyle = bit ? fgColor : bgColor;
         ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
       }
     }
-  }, [binaryString, fg_color, bg_color, pixelSize]);
+  }, [bitmask, fgColor, bgColor, pixelSize]);
 
-  // Redraw on binaryString, fg_color, bg_color, pixelSize changes
+  // Redraw on binaryString, fgColor, bgColor, pixelSize changes
   useEffect(() => {
     drawGrid();
   }, [drawGrid]);
@@ -135,23 +112,55 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
   ) => {
     const { x, y } = getMouseOrTouchPosition(e);
     const index = y * GRID_SIZE + x;
-    if (index < 0 || index >= binaryString.length) return;
+    if (index < 0 || index >= GRID_SIZE * GRID_SIZE) return;
 
-    if (binaryString[index] === (isEraser ? "0" : "1")) {
+    if (getBit(bitmask, index) === (isSecondary ? false : true)) {
       // No change needed
       return;
     }
 
-    // Update binary string with new pixel value
-    const newBinaryArray = binaryString.split("");
-    newBinaryArray[index] = isEraser ? "0" : "1";
-    setBinaryString(newBinaryArray.join(""));
+    const setNewBit = isSecondary ? clearBit : setBit;
+
+    // Update bitmask with new pixel value
+    const newBitmask = new BigUint64Array(bitmask);
+    if (isPen) {
+      setNewBit(newBitmask, index);
+      setBitmask(newBitmask);
+      return;
+    }
+
+    // dfs to find connected pixels
+    const targetValue = getBit(bitmask, index); // what we are replacing
+    const stack: [number, number][] = [[x, y]];
+
+    while (stack.length > 0) {
+      const [cx, cy] = stack.pop()!;
+      const cIndex = cy * GRID_SIZE + cx;
+
+      // Bounds check
+      if (cx < 0 || cy < 0 || cx >= GRID_SIZE || cy >= GRID_SIZE) continue;
+
+      // Skip if this pixel isn't the target value
+      if (getBit(newBitmask, cIndex) !== targetValue) continue;
+
+      // Set to new value
+      setNewBit(newBitmask, cIndex);
+
+      // Push neighbors
+      stack.push([cx + 1, cy]);
+      stack.push([cx - 1, cy]);
+      stack.push([cx, cy + 1]);
+      stack.push([cx, cy - 1]);
+    }
+
+    setBitmask(newBitmask);
   };
 
   // Mouse and touch event handlers
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     setDrawing(true);
+    checkpointStateBeforeNewAction();
     updatePixel(e);
   };
 
@@ -167,6 +176,7 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
   const handleTouchStart = (e: TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     setDrawing(true);
+    checkpointStateBeforeNewAction();
     updatePixel(e);
   };
 
@@ -181,73 +191,22 @@ const CanvasGrid: React.FC<CanvasGridProps> = ({
     updatePixel(e);
   };
 
-  // Clear canvas handler
-  const clearCanvas = () => {
-    setBinaryString("0".repeat(GRID_SIZE * GRID_SIZE));
-  };
-
-  // Toggle eraser/draw mode
-  const toggleEraser = () => {
-    setIsEraser((prev) => !prev);
-  };
-
-  // Save handler: send hex string of current grid state
-  const handleSave = async () => {
-    try {
-      const response = await fetch("/api/updatekb", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          bg_color,
-          fg_color,
-          value: binaryStringToHex(binaryString),
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to save changes");
-
-      const data = await response.json();
-      console.log("Save successful:", data);
-    } catch (error) {
-      console.error("Error saving changes:", error);
-    }
-  };
-
   return (
     <div id="canvas-grid-wrapper" className="flex flex-col items-center">
       <canvas
         ref={canvasRef}
         width={GRID_SIZE * pixelSize}
         height={GRID_SIZE * pixelSize}
-        className="touch-none border border-gray-300"
+        className="touch-none border border-foreground"
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp} // stop drawing if mouse leaves canvas
         onMouseMove={handleMouseMove}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchEnd}
         onTouchMove={handleTouchMove}
-        style={{ touchAction: "none", imageRendering: "pixelated" }}
+        style={{ imageRendering: "pixelated" }}
       />
-
-      <div className="flex flex-col space-y-2 pt-4 w-full max-w-xs">
-        <Button asChild size="sm" variant={"outline"}>
-          <button onClick={toggleEraser}>
-            {isEraser ? "Switch to Draw" : "Switch to Eraser"}
-          </button>
-        </Button>
-        <Button asChild size="sm" variant={"destructive"}>
-          <button onClick={clearCanvas}>Clear Canvas</button>
-        </Button>
-        <Button asChild size="sm" variant={"outline"}>
-          <button onClick={handleSave}>Save Changes</button>
-        </Button>
-      </div>
     </div>
   );
-};
-
-export default CanvasGrid;
+}
