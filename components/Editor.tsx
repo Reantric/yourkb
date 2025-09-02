@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import { bitmaskToHexadecimal, hexadecimalToBitmask } from "@/lib/bits";
 import { Switch } from "./ui/switch";
 import {
+  CopyIcon,
   EraserIcon,
   PaintBucketIcon,
   PencilLineIcon,
@@ -108,6 +109,7 @@ function Editor({
   const [bitmask, setBitmask] = useState<BigUint64Array>(
     hexadecimalToBitmask(initHexString),
   );
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [latestStates, setLatestStates] = useState<BigUint64Array[]>([]);
   const [futureStates, setFutureStates] = useState<BigUint64Array[]>([]);
 
@@ -163,6 +165,18 @@ function Editor({
     ) {
       setShowBgPicker(false);
     }
+  };
+
+  // copy canvas handler
+  const copyCanvasToClipboard = async () => {
+    if (!canvasRef.current) return;
+    canvasRef.current.toBlob(async (blob) => {
+      if (!blob) return;
+      await navigator.clipboard.write([
+        new ClipboardItem({ [blob.type]: blob }),
+      ]);
+      toast({ title: "Drawing copied to clipboard!", variant: "success" });
+    });
   };
 
   // Save handler: send hex string of current grid state
@@ -252,6 +266,7 @@ function Editor({
         bitmask={bitmask}
         setBitmask={setBitmask}
         checkpointStateBeforeNewAction={checkpointStateBeforeNewAction}
+        canvasRef={canvasRef}
       />
 
       {/* Actions footer menu */}
@@ -277,6 +292,13 @@ function Editor({
           </Button>
         </div>
         <div className="flex flex-row items-center gap-2">
+          <Button
+            onClick={copyCanvasToClipboard}
+            className="p-2.5"
+            title="Copy Drawing"
+          >
+            <CopyIcon className="w-5 h-5" />
+          </Button>
           <CopyLinkButton id={imageId} compact={true} />
           <Button
             onClick={handleSave}

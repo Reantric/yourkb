@@ -1,4 +1,4 @@
-import CanvasDisplay from "@/components/Viewer";
+import Viewer from "@/components/Viewer";
 
 import { createClient } from "@/utils/supabase/server";
 
@@ -23,11 +23,13 @@ export default async function Gallery() {
       <ul className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {data.map((item) => (
           <Link href={`/view/${item.id}`} key={item.id}>
-            <CanvasDisplay
+            <Viewer
+              id={item.id}
               fgColor={item.fg_color}
               bgColor={item.bg_color}
               hexString={item.value}
               pixelSize={4}
+              imageOnly={true}
             />
           </Link>
         ))}

@@ -2,7 +2,6 @@
 
 import {
   useState,
-  useRef,
   useEffect,
   MouseEvent,
   TouchEvent,
@@ -25,6 +24,7 @@ export default function CanvasGrid({
   bitmask,
   setBitmask,
   checkpointStateBeforeNewAction,
+  canvasRef,
 }: {
   fgColor: string;
   bgColor: string;
@@ -37,9 +37,8 @@ export default function CanvasGrid({
   bitmask: BigUint64Array;
   setBitmask: React.Dispatch<React.SetStateAction<BigUint64Array>>;
   checkpointStateBeforeNewAction: () => void;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
   // Responsive pixel size state
   const [pixelSize, setPixelSize] = useState<number>(
     customPixelSize || DEFAULT_PIXEL_SIZE,

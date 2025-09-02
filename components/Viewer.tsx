@@ -1,16 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import CopyLinkButton from "./LinkButton";
+import { Toaster } from "./ui/toaster";
+import { CopyIcon, Share2Icon } from "lucide-react";
+import { Button } from "./ui/button";
+import { useToast } from "./hooks/use-toast";
 
 const GRID_SIZE = 64;
-
-interface CanvasDisplayProps {
-  fgColor: string;
-  bgColor: string;
-  hexString: string;
-  pixelSize: number;
-  smallWindowPixelSize?: number;
-}
 
 // Function to convert hex string to binary string
 const hexToBinaryString = (hexString: string): string => {
@@ -23,14 +20,27 @@ const hexToBinaryString = (hexString: string): string => {
   return binaryString;
 };
 
-const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
+export default function CanvasDisplay({
+  id,
   bgColor,
   fgColor,
   hexString,
   pixelSize,
   smallWindowPixelSize,
-}) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  imageOnly,
+}: {
+  id: number;
+  fgColor: string;
+  bgColor: string;
+  hexString: string;
+  pixelSize: number;
+  smallWindowPixelSize?: number;
+  imageOnly?: boolean;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const { toast } = useToast();
+
   const binaryString = hexToBinaryString(hexString);
 
   const finalPixelSize =
@@ -65,15 +75,79 @@ const CanvasDisplay: React.FC<CanvasDisplayProps> = ({
     }
   }, [bgColor, fgColor, hexString, finalPixelSize]);
 
+  const copyCanvasToClipboard = async () => {
+    if (!canvasRef.current) return;
+
+    // Convert the canvas contents into a Blob (PNG by default)
+    canvasRef.current.toBlob(async (blob) => {
+      if (!blob) return;
+
+      try {
+        // Wrap it in a ClipboardItem and write to the clipboard
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            [blob.type]: blob,
+          }),
+        ]);
+        toast({
+          title: "Canvas image copied to clipboard!",
+          variant: "success",
+        });
+      } catch (err: unknown) {
+        toast({
+          title: "Error in copying drawing.",
+          variant: "destructive",
+          description: (err as Error).message,
+        });
+      }
+    });
+  };
+
+  if (imageOnly) {
+    return (
+      <div>
+        <canvas
+          ref={canvasRef}
+          width={GRID_SIZE * finalPixelSize}
+          height={GRID_SIZE * finalPixelSize}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <canvas
-        ref={canvasRef}
-        width={GRID_SIZE * finalPixelSize}
-        height={GRID_SIZE * finalPixelSize}
-      />
+    <div className="flex-1 flex flex-col space-y-2">
+      <div>
+        <canvas
+          ref={canvasRef}
+          width={GRID_SIZE * finalPixelSize}
+          height={GRID_SIZE * finalPixelSize}
+        />
+      </div>
+      <div className="flex flex-row justify-end gap-2">
+        <Button
+          className="p-2.5"
+          title="Copy Drawing"
+          onClick={copyCanvasToClipboard}
+        >
+          <CopyIcon className="w-5 h-5" />
+        </Button>
+        <CopyLinkButton id={id} compact={true} />
+        <Button
+          className="p-2.5"
+          title="Share Image"
+          onClick={async () => {
+            await navigator.share({
+              title: "Share Image",
+              text: "Check out this image!",
+              url: window.location.href,
+            });
+          }}
+        >
+          <Share2Icon className="w-5 h-5" />
+        </Button>
+      </div>
+      <Toaster />
     </div>
   );
-};
-
-export default CanvasDisplay;
+}
