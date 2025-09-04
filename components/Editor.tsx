@@ -334,7 +334,7 @@ function Editor({
             variant="outline"
             disabled={initHexString === bitmaskToHexadecimal(bitmask)}
           >
-            <SaveIcon className="w-5 h-5" />
+            <SaveIcon className="w-5 h-5 mr-1" /> Save
           </Button>
         </div>
       </div>
