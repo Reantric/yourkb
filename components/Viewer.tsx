@@ -37,6 +37,8 @@ export default function CanvasDisplay({
   imageOnly,
   isAdmin,
   isHidden,
+  numLikes,
+  isLiked,
 }: {
   id: number;
   fgColor: string;
@@ -47,6 +49,8 @@ export default function CanvasDisplay({
   imageOnly?: boolean;
   isAdmin?: boolean;
   isHidden?: boolean;
+  numLikes?: number;
+  isLiked?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -164,9 +168,6 @@ export default function CanvasDisplay({
       }
     });
   };
-
-  const isLiked = false; // Placeholder for like status
-
   return (
     <div className="flex-1 flex flex-col space-y-2">
       <div>
@@ -178,8 +179,24 @@ export default function CanvasDisplay({
       </div>
       <div className="flex flex-row justify-between">
         <div>
-          <Button title="Like" variant={isLiked ? "default" : "outline"}>
-            <HeartIcon className="w-5 h-5" />
+          <Button
+            title="Like"
+            variant={isLiked ? "default" : "outline"}
+            onClick={async () => {
+              await fetch("/api/switchlikestatus", {
+                method: "POST",
+                body: JSON.stringify({
+                  image_id: id,
+                  new_like_status: !isLiked,
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+              refresh();
+            }}
+          >
+            <HeartIcon className="w-5 h-5 mr-1" /> {numLikes}
           </Button>
         </div>
         <div className="flex flex-row space-x-2">

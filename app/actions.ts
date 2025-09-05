@@ -164,3 +164,26 @@ export const signInWithGoogle = async () => {
     redirect(data.url);
   }
 };
+
+export const hasUserLikedImage = async (imageId: number) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return false;
+  }
+  const { error } = await supabase
+    .from("likes")
+    .select()
+    .eq("user_id", user.id)
+    .eq("image_id", imageId)
+    .single();
+
+  // no such record
+  if (error) {
+    return false;
+  }
+
+  return true;
+};
