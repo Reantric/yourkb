@@ -12,7 +12,12 @@ export default async function Gallery() {
 
   const { data, error } = await (isAdmin
     ? supabase.from("kilobytes").select().limit(1000) // higher limit for admins, no filter
-    : supabase.from("kilobytes").select().eq("hidden", false).limit(100));
+    : supabase
+        .from("kilobyte_like_counts")
+        .select()
+        .eq("hidden", false)
+        .limit(100)
+        .order("like_count", { ascending: false })); // only non-hidden for normal users
 
   if (error) {
     console.error(error);

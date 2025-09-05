@@ -54,7 +54,7 @@ export default function CanvasDisplay({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { refresh } = useRouter();
+  const { refresh, push } = useRouter();
 
   const { toast } = useToast();
 
@@ -183,7 +183,7 @@ export default function CanvasDisplay({
             title="Like"
             variant={isLiked ? "default" : "outline"}
             onClick={async () => {
-              await fetch("/api/switchlikestatus", {
+              const result = await fetch("/api/switchlikestatus", {
                 method: "POST",
                 body: JSON.stringify({
                   image_id: id,
@@ -193,6 +193,19 @@ export default function CanvasDisplay({
                   "Content-Type": "application/json",
                 },
               });
+              if (!result.ok) {
+                if (result.status === 401) {
+                  return push("/sign-in");
+                }
+                const error = await result.json();
+                if (error) {
+                  toast({
+                    title: "Error liking image",
+                    variant: "destructive",
+                    description: error.message,
+                  });
+                }
+              }
               refresh();
             }}
           >
