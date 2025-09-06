@@ -1,4 +1,4 @@
-import { isCurrentUserAdmin } from "@/app/actions";
+import { hasUserLikedImage, isCurrentUserAdmin } from "@/app/actions";
 import Viewer from "@/components/Viewer";
 
 import { createClient } from "@/utils/supabase/server";
@@ -18,9 +18,11 @@ export default async function ViewKilobyte({
   const desiredImageId = Number.parseInt(slug);
 
   const { data, error } = await supabase
-    .from("kilobytes")
+    .from("kilobyte_like_counts")
     .select()
     .eq("id", desiredImageId);
+
+  const isLiked = await hasUserLikedImage(desiredImageId);
 
   if (error || !data) {
     return (
@@ -45,6 +47,8 @@ export default async function ViewKilobyte({
       smallWindowPixelSize={3}
       isAdmin={isAdmin}
       isHidden={data[0].hidden}
+      numLikes={data[0].like_count}
+      isLiked={isLiked}
     />
   );
 }
