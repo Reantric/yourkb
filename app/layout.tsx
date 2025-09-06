@@ -4,16 +4,22 @@ import "./globals.css";
 import CookieConsentBanner from "@/components/CookieBanner";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import type { Metadata } from "next";
 
-const DEFAULT_URL = process.env.VERCEL_URL
+export async function generateMetadata(): Promise<Metadata> {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  const DEFAULT_URL = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
-export const metadata = {
-  metadataBase: new URL(DEFAULT_URL),
-  title: "YourKB",
-  description: "The simplest way to make your mark on the web",
-};
+  const origin = explicit ? explicit : DEFAULT_URL;
+  
+  return {
+    metadataBase: new URL(origin),
+    title: "YourKB",
+    description: "The simplest way to make your mark on the web",
+  };
+}
 
 export default function RootLayout({
   children,
