@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import CopyLinkButton from "./LinkButton";
 import { Toaster } from "./ui/toaster";
 import {
@@ -27,7 +27,7 @@ const hexToBinaryString = (hexString: string): string => {
   return binaryString;
 };
 
-export default function CanvasDisplay({
+export default memo(function CanvasDisplay({
   id,
   bgColor,
   fgColor,
@@ -169,7 +169,7 @@ export default function CanvasDisplay({
     });
   };
   return (
-    <div className="flex-1 flex flex-col space-y-2">
+    <div className="flex-1 flex flex-col space-y-2 justify-center items-center">
       <div>
         <canvas
           ref={canvasRef}
@@ -177,7 +177,7 @@ export default function CanvasDisplay({
           height={GRID_SIZE * finalPixelSize}
         />
       </div>
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between space-x-2">
         <div>
           <Button
             title="Like"
@@ -254,4 +254,4 @@ export default function CanvasDisplay({
       <Toaster />
     </div>
   );
-}
+});

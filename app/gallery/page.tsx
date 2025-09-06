@@ -1,9 +1,9 @@
-import Viewer from "@/components/Viewer";
-
 import { createClient } from "@/utils/supabase/server";
 
-import Link from "next/link";
 import { isCurrentUserAdmin } from "../actions";
+import GalleryLoader from "@/components/GalleryLoader";
+
+const CHUNK_SIZE = 60;
 
 export default async function Gallery() {
   const supabase = await createClient();
@@ -16,7 +16,7 @@ export default async function Gallery() {
         .from("kilobyte_like_counts")
         .select()
         .eq("hidden", false)
-        .limit(100)
+        .limit(CHUNK_SIZE)
         .order("like_count", { ascending: false })); // only non-hidden for normal users
 
   if (error) {
@@ -30,20 +30,7 @@ export default async function Gallery() {
 
   return (
     <div className="flex-1 flex flex-col gap-6 px-4">
-      <ul className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {data.map((item) => (
-          <Link href={`/view/${item.id}`} key={item.id}>
-            <Viewer
-              id={item.id}
-              fgColor={item.fg_color}
-              bgColor={item.bg_color}
-              hexString={item.value}
-              pixelSize={4}
-              imageOnly={true}
-            />
-          </Link>
-        ))}
-      </ul>
+      <GalleryLoader initialData={data} />
     </div>
   );
 }

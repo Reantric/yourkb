@@ -296,7 +296,7 @@ function Editor({
       />
 
       {/* Actions footer menu */}
-      <div className="flex flex-row justify-between pt-2 items-center">
+      <div className="flex flex-row justify-between pt-2 items-center space-x-2">
         <div className="flex flex-row items-center gap-2">
           <Button
             className="p-2.5"
@@ -339,7 +339,7 @@ function Editor({
         </div>
       </div>
 
-      <div className="flex flex-row justify-between pt-2 items-center">
+      <div className="flex flex-row justify-between pt-2 items-center space-x-2">
         <div className="flex flex-row items-center">
           <div className="flex flex-row gap-2 items-center">
             <Toggle

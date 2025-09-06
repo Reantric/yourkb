@@ -21,6 +21,14 @@ export default function Footer() {
       >
         Privacy Policy
       </Link>
+      <a
+        href="https://github.com/ezou626/yourkb"
+        target="_blank"
+        className="font-bold hover:underline"
+        rel="noreferrer"
+      >
+        Source Code
+      </a>
       <Link
         href="/changelog"
         className="font-bold hover:underline"
