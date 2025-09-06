@@ -1,11 +1,13 @@
 import { ImageResponse } from "next/og";
-import { NextRequest } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
 export const runtime = "edge";
-
-const WIDTH = 1200;
-const HEIGHT = 630;
+export const alt = "YourKB preview";
+export const size = {
+  width: 1200,
+  height: 630,
+};
+export const contentType = "image/png";
 
 const GRID_SIZE = 64;
 
@@ -19,10 +21,11 @@ function hexToBinaryString(hexString: string): string {
   return binaryString;
 }
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { slug: string } },
-) {
+export default async function Image({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const { slug } = params;
   const id = Number.parseInt(slug);
   if (Number.isNaN(id)) {
@@ -34,7 +37,7 @@ export async function GET(
     .from("kilobytes")
     .select()
     .eq("id", id)
-  .single();
+    .single();
 
   if (error || !data || data.hidden) {
     return new Response("Not found", { status: 404 });
@@ -45,13 +48,12 @@ export async function GET(
   const hexString: string = data.value as string;
   const bin = hexToBinaryString(hexString);
 
-  // Compute a pixel size that fits 64x64 into WIDTHxHEIGHT with padding
+  // Compute a pixel size that fits into the canvas with padding
   const padding = 60;
-  const availW = WIDTH - padding * 2;
-  const availH = HEIGHT - padding * 2;
+  const availW = size.width - padding * 2;
+  const availH = size.height - padding * 2;
   const px = Math.floor(Math.min(availW / GRID_SIZE, availH / GRID_SIZE));
 
-  // We'll render a CSS grid of absolutely positioned divs for speed
   const cells: JSX.Element[] = [];
   for (let y = 0; y < GRID_SIZE; y++) {
     for (let x = 0; x < GRID_SIZE; x++) {
@@ -77,8 +79,8 @@ export async function GET(
     (
       <div
         style={{
-      width: WIDTH,
-      height: HEIGHT,
+          width: size.width,
+          height: size.height,
           display: "flex",
           background: bgColor,
           position: "relative",
@@ -87,6 +89,6 @@ export async function GET(
         {cells}
       </div>
     ),
-    { width: WIDTH, height: HEIGHT }
+    { width: size.width, height: size.height }
   );
 }
