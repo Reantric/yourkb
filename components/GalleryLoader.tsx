@@ -42,7 +42,6 @@ export default function GalleryLoader({
           window.innerHeight + window.pageYOffset >=
           document.body.offsetHeight - 50
         ) {
-          console.log("firing");
           onReachedEnd();
         }
       }, 200); // debounce: wait 200ms after last scroll event
