@@ -58,6 +58,19 @@ export default memo(function CanvasDisplay({
 
   const { toast } = useToast();
 
+  // check if web share api is supported
+  // ideally, we would use navigator.canShare(), but that's not supported in all browsers
+  const [canShare, setCanShare] = useState(false);
+  const [shareDisabled, setShareDisabled] = useState(false);
+  useEffect(() => {
+    try {
+      // Some browsers (ahem, firefox) don’t expose share on Navigator type; cast to any
+      setCanShare(typeof navigator !== "undefined" && typeof (navigator as any).share === "function");
+    } catch {
+      setCanShare(false);
+    }
+  }, []);
+
   const binaryString = hexToBinaryString(hexString);
 
   // for some reason I can't get window here
@@ -237,13 +250,34 @@ export default memo(function CanvasDisplay({
           <CopyLinkButton id={id} compact={true} />
           <Button
             className="p-2.5"
-            title="Share Image"
+            title={shareDisabled ? "Share unsupported" : "Share Image"}
+            disabled={shareDisabled}
             onClick={async () => {
-              await navigator.share({
-                title: "Share Image",
-                text: "Check out this image!",
-                url: window.location.href,
-              });
+              if (!canShare) {
+                toast({
+                  title: "Unsupported",
+                  description: "Sharing isn't supported in this browser.",
+                  variant: "destructive",
+                });
+                setShareDisabled(true);
+                return;
+              }
+              try {
+                await (navigator as any).share({
+                  title: "Share Image",
+                  text: "Check out this image!",
+                  url: window.location.href,
+                });
+              } catch (err: unknown) {
+                const e = err as Error & { name?: string };
+                if (e?.name !== "AbortError") {
+                  toast({
+                    title: "Share failed",
+                    description: e?.message || "Unable to share.",
+                    variant: "destructive",
+                  });
+                }
+              }
             }}
             variant="outline"
           >

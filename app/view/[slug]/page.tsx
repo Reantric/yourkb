@@ -3,6 +3,7 @@ import Viewer from "@/components/Viewer";
 import type { Metadata } from "next";
 
 import { createClient } from "@/utils/supabase/server";
+import { getOrigin } from "@/utils/utils";
 
 export async function generateMetadata({
   params,
@@ -12,12 +13,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const title = `YourKB #${slug}`;
   const description = "View this kilobyte on YourKB";
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
-  const DEFAULT_URL = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
-
-  const origin = explicit ? explicit : DEFAULT_URL;
+  const origin = getOrigin();
   
   return {
     title,

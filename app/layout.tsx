@@ -5,14 +5,10 @@ import CookieConsentBanner from "@/components/CookieBanner";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import type { Metadata } from "next";
+import { getOrigin } from "@/utils/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
-  const DEFAULT_URL = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
-
-  const origin = explicit ? explicit : DEFAULT_URL;
+  const origin = getOrigin();
   
   return {
     metadataBase: new URL(origin),
