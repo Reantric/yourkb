@@ -1,7 +1,36 @@
 import { isCurrentUserAdmin } from "@/app/actions";
 import Viewer from "@/components/Viewer";
+import type { Metadata } from "next";
 
 import { createClient } from "@/utils/supabase/server";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const title = `YourKB #${slug}`;
+  const description = "View this kilobyte on YourKB";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `/view/${slug}`,
+      type: "article",
+      images: [`/view/${slug}/opengraph-image`],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`/view/${slug}/opengraph-image`],
+    },
+  };
+}
 
 export default async function ViewKilobyte({
   params,
