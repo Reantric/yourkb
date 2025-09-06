@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import CopyLinkButton from "./LinkButton";
 import { Toaster } from "./ui/toaster";
 import {
@@ -27,7 +27,7 @@ const hexToBinaryString = (hexString: string): string => {
   return binaryString;
 };
 
-export default function CanvasDisplay({
+export default memo(function CanvasDisplay({
   id,
   bgColor,
   fgColor,
@@ -254,4 +254,4 @@ export default function CanvasDisplay({
       <Toaster />
     </div>
   );
-}
+});
