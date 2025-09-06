@@ -16,6 +16,15 @@ import { useRouter } from "next/navigation";
 
 const GRID_SIZE = 64;
 
+// ---------- Types & helpers ----------
+type WebShareNavigator = Navigator & {
+  share?: (data: ShareData) => Promise<void>;
+  canShare?: (data?: ShareData) => boolean;
+};
+
+const getWebShareNavigator = (): WebShareNavigator | undefined =>
+  typeof navigator === "undefined" ? undefined : (navigator as WebShareNavigator);
+
 // Function to convert hex string to binary string
 const hexToBinaryString = (hexString: string): string => {
   let binaryString = "";
@@ -62,13 +71,10 @@ export default memo(function CanvasDisplay({
   // ideally, we would use navigator.canShare(), but that's not supported in all browsers
   const [canShare, setCanShare] = useState(false);
   const [shareDisabled, setShareDisabled] = useState(false);
+  
   useEffect(() => {
-    try {
-      // Some browsers (ahem, firefox) don’t expose share on Navigator type; cast to any
-      setCanShare(typeof navigator !== "undefined" && typeof (navigator as any).share === "function");
-    } catch {
-      setCanShare(false);
-    }
+    const nav = getWebShareNavigator();
+    setCanShare(Boolean(nav?.share));
   }, []);
 
   const binaryString = hexToBinaryString(hexString);
@@ -263,7 +269,7 @@ export default memo(function CanvasDisplay({
                 return;
               }
               try {
-                await (navigator as any).share({
+                await (navigator as WebShareNavigator).share({
                   title: "Share Image",
                   text: "Check out this image!",
                   url: window.location.href,
