@@ -23,7 +23,6 @@ function hexToBinaryString(hexString: string): string {
 }
 
 export async function GET(
-  req: NextRequest,
   { params }: { params: { slug: string } },
 ) {
   const { slug } = params;
@@ -53,8 +52,6 @@ export async function GET(
   const availW = size.width - padding * 2;
   const availH = size.height - padding * 2;
   const px = Math.floor(Math.min(availW / GRID_SIZE, availH / GRID_SIZE));
-  const canvasW = GRID_SIZE * px;
-  const canvasH = GRID_SIZE * px;
 
   // We'll render a CSS grid of absolutely positioned divs for speed
   const cells: JSX.Element[] = [];
