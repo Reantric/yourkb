@@ -12,25 +12,28 @@ export async function generateMetadata({
   const { slug } = await params;
   const title = `YourKB #${slug}`;
   const description = "View this kilobyte on YourKB";
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
   const DEFAULT_URL = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
+  const origin = explicit ? explicit : DEFAULT_URL;
+  
   return {
     title,
     description,
     openGraph: {
       title,
       description,
-      url: `${DEFAULT_URL}/view/${slug}`,
+      url: `${origin}/view/${slug}`,
       type: "article",
-      images: [`${DEFAULT_URL}/view/${slug}/opengraph-image`],
+      images: [`${origin}/view/${slug}/opengraph-image`],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [`${DEFAULT_URL}/view/${slug}/opengraph-image`],
+      images: [`${origin}/view/${slug}/opengraph-image`],
     },
   };
 }
