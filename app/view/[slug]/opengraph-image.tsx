@@ -4,8 +4,8 @@ import { createClient } from "@/utils/supabase/server";
 export const runtime = "edge";
 export const alt = "YourKB preview";
 export const size = {
-  width: 1200,
-  height: 630,
+  width: 640,
+  height: 640,
 };
 export const contentType = "image/png";
 
@@ -49,9 +49,8 @@ export default async function Image({
   const bin = hexToBinaryString(hexString);
 
   // Compute a pixel size that fits into the canvas with padding
-  const padding = 60;
-  const availW = size.width - padding * 2;
-  const availH = size.height - padding * 2;
+  const availW = size.width;
+  const availH = size.height;
   const px = Math.floor(Math.min(availW / GRID_SIZE, availH / GRID_SIZE));
 
   const cells: JSX.Element[] = [];
@@ -64,8 +63,8 @@ export default async function Image({
           key={`${x}-${y}`}
           style={{
             position: "absolute",
-            left: padding + x * px,
-            top: padding + y * px,
+            left: x * px,
+            top: y * px,
             width: px,
             height: px,
             background: bit ? fgColor : bgColor,
