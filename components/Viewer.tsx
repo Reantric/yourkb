@@ -169,7 +169,7 @@ export default function CanvasDisplay({
     });
   };
   return (
-    <div className="flex-1 flex flex-col space-y-2">
+    <div className="flex-1 flex flex-col space-y-2 justify-center items-center">
       <div>
         <canvas
           ref={canvasRef}
@@ -177,7 +177,7 @@ export default function CanvasDisplay({
           height={GRID_SIZE * finalPixelSize}
         />
       </div>
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between space-x-2">
         <div>
           <Button
             title="Like"
