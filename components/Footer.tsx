@@ -11,7 +11,7 @@ export default function Footer() {
           className="font-bold hover:underline"
           rel="noreferrer"
         >
-          King Zou
+          Eric Zou
         </a>
       </span>
       <Link
