@@ -249,7 +249,11 @@ function Editor({
   // alert the user about unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (initHexString !== bitmaskToHexadecimal(bitmask)) {
+      if (
+        initHexString !== bitmaskToHexadecimal(bitmask) ||
+        bgColor !== initBgColor ||
+        fgColor !== initFgColor
+      ) {
         event.preventDefault();
       }
     };
@@ -332,7 +336,11 @@ function Editor({
             className="p-2.5 bg-blue-500"
             title="Save"
             variant="outline"
-            disabled={initHexString === bitmaskToHexadecimal(bitmask)}
+            disabled={
+              initHexString === bitmaskToHexadecimal(bitmask) &&
+              bgColor === initBgColor &&
+              fgColor === initFgColor
+            }
           >
             <SaveIcon className="w-5 h-5 mr-1" /> Save
           </Button>
