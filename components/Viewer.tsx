@@ -177,7 +177,7 @@ export default memo(function CanvasDisplay({
           height={GRID_SIZE * finalPixelSize}
         />
       </div>
-      <div className="flex flex-row justify-between space-x-2">
+      <div className="flex flex-row justify-between space-x-2 w-full">
         <div>
           <Button
             title="Like"
