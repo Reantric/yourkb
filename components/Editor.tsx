@@ -383,7 +383,7 @@ function Editor({
                 setBitmask(new BigUint64Array(64));
               }}
             >
-              <XIcon className="w-5 h-5" />
+              <XIcon className="w-5 h-5 mr-1" /> Clear
             </Button>
           </div>
         </div>
