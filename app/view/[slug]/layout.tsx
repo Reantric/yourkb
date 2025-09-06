@@ -4,8 +4,6 @@ const DEFAULT_URL = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(DEFAULT_URL),
-  title: "YourKB",
-  description: "The simplest way to make your mark on the web",
 };
 
 export default function Layout({
@@ -14,6 +12,8 @@ export default function Layout({
   children: React.ReactNode;
 }) {
   return (
-    {children}
+     <>
+      {children}
+    </>
   );
 }
