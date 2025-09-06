@@ -5,6 +5,8 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+const LOAD_MORE_CHUNK_SIZE = 30;
+
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
@@ -163,4 +165,53 @@ export const signInWithGoogle = async () => {
   if (data.url) {
     redirect(data.url);
   }
+};
+
+export const hasUserLikedImage = async (imageId: number) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return false;
+  }
+  const { error } = await supabase
+    .from("likes")
+    .select()
+    .eq("user_id", user.id)
+    .eq("image_id", imageId)
+    .single();
+
+  // no such record
+  if (error) {
+    return false;
+  }
+
+  return true;
+};
+
+export const getMoreImages = async (nextStartingIndex: number) => {
+  "use server";
+  const supabase = await createClient();
+
+  const isAdmin = await isCurrentUserAdmin();
+
+  const { data, error } = isAdmin
+    ? await supabase
+        .from("kilobytes")
+        .select()
+        .range(nextStartingIndex, nextStartingIndex + LOAD_MORE_CHUNK_SIZE - 1)
+    : await supabase
+        .from("kilobyte_like_counts")
+        .select()
+        .eq("hidden", false)
+        .range(nextStartingIndex, nextStartingIndex + LOAD_MORE_CHUNK_SIZE - 1)
+        .order("like_count", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data;
 };

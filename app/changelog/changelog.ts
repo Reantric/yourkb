@@ -8,6 +8,18 @@ export type Change = {
 export const CHANGES: Change[] = [
   {
     year: 2025,
+    month: 9,
+    day: 6,
+    description: "Added infinite scroll to the gallery and visual adjustments",
+  },
+  {
+    year: 2025,
+    month: 9,
+    day: 5,
+    description: "Added ability to like kilobytes and revamped the editor",
+  },
+  {
+    year: 2025,
     month: 1,
     day: 22,
     description:

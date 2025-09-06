@@ -249,7 +249,11 @@ function Editor({
   // alert the user about unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (initHexString !== bitmaskToHexadecimal(bitmask)) {
+      if (
+        initHexString !== bitmaskToHexadecimal(bitmask) ||
+        bgColor !== initBgColor ||
+        fgColor !== initFgColor
+      ) {
         event.preventDefault();
       }
     };
@@ -296,7 +300,7 @@ function Editor({
       />
 
       {/* Actions footer menu */}
-      <div className="flex flex-row justify-between pt-2 items-center">
+      <div className="flex flex-row justify-between pt-2 items-center space-x-2">
         <div className="flex flex-row items-center gap-2">
           <Button
             className="p-2.5"
@@ -332,14 +336,18 @@ function Editor({
             className="p-2.5 bg-blue-500"
             title="Save"
             variant="outline"
-            disabled={initHexString === bitmaskToHexadecimal(bitmask)}
+            disabled={
+              initHexString === bitmaskToHexadecimal(bitmask) &&
+              bgColor === initBgColor &&
+              fgColor === initFgColor
+            }
           >
-            <SaveIcon className="w-5 h-5" />
+            <SaveIcon className="w-5 h-5 mr-1" /> Save
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-row justify-between pt-2 items-center">
+      <div className="flex flex-row justify-between pt-2 items-center space-x-2">
         <div className="flex flex-row items-center">
           <div className="flex flex-row gap-2 items-center">
             <Toggle
@@ -383,7 +391,7 @@ function Editor({
                 setBitmask(new BigUint64Array(64));
               }}
             >
-              <XIcon className="w-5 h-5" />
+              <XIcon className="w-5 h-5 mr-1" /> Clear
             </Button>
           </div>
         </div>

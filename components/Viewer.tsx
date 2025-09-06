@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import CopyLinkButton from "./LinkButton";
 import { Toaster } from "./ui/toaster";
-import { CopyIcon, EyeIcon, EyeOffIcon, Share2Icon } from "lucide-react";
+import {
+  CopyIcon,
+  EyeIcon,
+  EyeOffIcon,
+  HeartIcon,
+  Share2Icon,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "./hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -21,7 +27,7 @@ const hexToBinaryString = (hexString: string): string => {
   return binaryString;
 };
 
-export default function CanvasDisplay({
+export default memo(function CanvasDisplay({
   id,
   bgColor,
   fgColor,
@@ -31,6 +37,8 @@ export default function CanvasDisplay({
   imageOnly,
   isAdmin,
   isHidden,
+  numLikes,
+  isLiked,
 }: {
   id: number;
   fgColor: string;
@@ -41,10 +49,12 @@ export default function CanvasDisplay({
   imageOnly?: boolean;
   isAdmin?: boolean;
   isHidden?: boolean;
+  numLikes?: number;
+  isLiked?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { refresh } = useRouter();
+  const { refresh, push } = useRouter();
 
   const { toast } = useToast();
 
@@ -87,6 +97,18 @@ export default function CanvasDisplay({
       }
     }
   }, [bgColor, fgColor, hexString, finalPixelSize]);
+
+  if (imageOnly) {
+    return (
+      <div>
+        <canvas
+          ref={canvasRef}
+          width={GRID_SIZE * finalPixelSize}
+          height={GRID_SIZE * finalPixelSize}
+        />
+      </div>
+    );
+  }
 
   const setNewVisibility = async () => {
     if (!isAdmin) return;
@@ -146,21 +168,8 @@ export default function CanvasDisplay({
       }
     });
   };
-
-  if (imageOnly) {
-    return (
-      <div>
-        <canvas
-          ref={canvasRef}
-          width={GRID_SIZE * finalPixelSize}
-          height={GRID_SIZE * finalPixelSize}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex-1 flex flex-col space-y-2">
+    <div className="flex-1 flex flex-col space-y-2 justify-center items-center">
       <div>
         <canvas
           ref={canvasRef}
@@ -168,45 +177,81 @@ export default function CanvasDisplay({
           height={GRID_SIZE * finalPixelSize}
         />
       </div>
-      <div className="flex flex-row justify-end gap-2">
-        {isAdmin && (
+      <div className="flex flex-row justify-between space-x-2 w-full">
+        <div>
           <Button
-            onClick={setNewVisibility}
-            variant={isHidden ? "default" : "destructive"}
-            title={isHidden ? "Unhide Kilobyte" : "Hide Kilobyte"}
+            title="Like"
+            variant={isLiked ? "default" : "outline"}
+            onClick={async () => {
+              const result = await fetch("/api/switchlikestatus", {
+                method: "POST",
+                body: JSON.stringify({
+                  image_id: id,
+                  new_like_status: !isLiked,
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+              if (!result.ok) {
+                if (result.status === 401) {
+                  return push("/sign-in");
+                }
+                const error = await result.json();
+                if (error) {
+                  toast({
+                    title: "Error liking image",
+                    variant: "destructive",
+                    description: error.message,
+                  });
+                }
+              }
+              refresh();
+            }}
           >
-            {isHidden ? (
-              <EyeIcon className="w-5 h-5" />
-            ) : (
-              <EyeOffIcon className="w-5 h-5" />
-            )}
+            <HeartIcon className="w-5 h-5 mr-1" /> {numLikes}
           </Button>
-        )}
-        <Button
-          className="p-2.5"
-          title="Copy Drawing"
-          onClick={copyCanvasToClipboard}
-          variant="outline"
-        >
-          <CopyIcon className="w-5 h-5" />
-        </Button>
-        <CopyLinkButton id={id} compact={true} />
-        <Button
-          className="p-2.5"
-          title="Share Image"
-          onClick={async () => {
-            await navigator.share({
-              title: "Share Image",
-              text: "Check out this image!",
-              url: window.location.href,
-            });
-          }}
-          variant="outline"
-        >
-          <Share2Icon className="w-5 h-5" />
-        </Button>
+        </div>
+        <div className="flex flex-row space-x-2">
+          {isAdmin && (
+            <Button
+              onClick={setNewVisibility}
+              variant={isHidden ? "default" : "destructive"}
+              title={isHidden ? "Unhide Kilobyte" : "Hide Kilobyte"}
+            >
+              {isHidden ? (
+                <EyeIcon className="w-5 h-5" />
+              ) : (
+                <EyeOffIcon className="w-5 h-5" />
+              )}
+            </Button>
+          )}
+          <Button
+            className="p-2.5"
+            title="Copy Drawing"
+            onClick={copyCanvasToClipboard}
+            variant="outline"
+          >
+            <CopyIcon className="w-5 h-5" />
+          </Button>
+          <CopyLinkButton id={id} compact={true} />
+          <Button
+            className="p-2.5"
+            title="Share Image"
+            onClick={async () => {
+              await navigator.share({
+                title: "Share Image",
+                text: "Check out this image!",
+                url: window.location.href,
+              });
+            }}
+            variant="outline"
+          >
+            <Share2Icon className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
       <Toaster />
     </div>
   );
-}
+});
