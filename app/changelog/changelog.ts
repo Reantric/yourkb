@@ -13,4 +13,10 @@ export const CHANGES: Change[] = [
     description:
       "Added a changelog, some visual updates and resolved some hidden warnings",
   },
+  {
+    year: 2025,
+    month: 9,
+    day: 6,
+    description: "Added ability to like kilobytes and revamped the editor",
+  },
 ];
