@@ -12,7 +12,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const title = `YourKB #${slug}`;
-  const description = "View this kilobyte on YourKB";
+  const description = "The simplest way to make your mark on the web";
   const origin = getOrigin();
   
   return {
