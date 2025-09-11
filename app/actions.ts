@@ -198,7 +198,7 @@ export const getMoreImages = async (nextStartingIndex: number) => {
 
   const { data, error } = isAdmin
     ? await supabase
-        .from("kilobytes")
+        .from("kilobyte_like_counts")
         .select()
         .range(nextStartingIndex, nextStartingIndex + LOAD_MORE_CHUNK_SIZE - 1)
     : await supabase
