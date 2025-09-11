@@ -22,6 +22,7 @@ import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./ui/toaster";
 import CopyLinkButton from "./LinkButton";
 import { useRouter } from "next/navigation";
+import { Banner } from "./ui/shadcn-io/banner";
 
 function ColorSelectorToggleButton({
   tooltip,
@@ -98,11 +99,13 @@ function Editor({
   initFgColor,
   initBgColor,
   initHexString,
+  isHidden,
 }: {
   imageId: number;
   initFgColor: string;
   initBgColor: string;
   initHexString: string;
+  isHidden: boolean;
 }) {
   // drawing state
   const [drawing, setDrawing] = useState(false);
@@ -266,6 +269,14 @@ function Editor({
 
   return (
     <>
+      {isHidden && (
+        <Banner className="mb-4">
+          <p>
+            This kilobyte is currently not visible to other users. Please
+            contact an admin for more information.
+          </p>
+        </Banner>
+      )}
       {/* Overlay */}
       <ColorSelectorPopover
         color={fgColor}
