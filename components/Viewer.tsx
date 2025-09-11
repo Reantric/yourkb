@@ -134,12 +134,6 @@ export default memo(function CanvasDisplay({
       });
       return;
     }
-
-    toast({
-      title: "Kilobyte hidden",
-      variant: "success",
-      description: "This kilobyte has been successfully hidden.",
-    });
     refresh();
   };
 

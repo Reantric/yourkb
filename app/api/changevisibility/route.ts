@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
 
   const isAdmin = await isCurrentUserAdmin();
 
+  // user wants to unhide a kilobyte, but isn't an admin
   if (!isAdmin) {
     return NextResponse.json(
       { error: "User does not have permission to access this resource" },
@@ -25,17 +26,20 @@ export async function POST(req: NextRequest) {
 
   const { id, newVisibility } = await req.json();
 
-  const { error: updateError } = await supabase
+  const { data, error: updateError } = await supabase
     .from("kilobytes")
     .update({ hidden: newVisibility })
-    .eq("id", id);
-  if (!updateError) {
+    .eq("id", id)
+    .select()
+    .single();
+  if (!updateError && data) {
     return NextResponse.json({
       status: 200,
       message: "This KB has now been hidden",
     });
   }
   console.error(updateError?.message);
+  console.log(data);
   console.log(req.headers);
   console.log(req.body);
   return NextResponse.json(
