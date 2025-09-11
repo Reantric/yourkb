@@ -22,7 +22,7 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ["**/*{ts,mts,cts}"],
+    files: ["**/*{ts,mts,cts}!(next-env.d.ts)"],
     plugins: { ts },
     languageOptions: { globals: globals.browser },
   },
