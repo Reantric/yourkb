@@ -20,7 +20,8 @@ export default async function ProtectedPage() {
   const { data, error } = await supabase
     .from("kilobytes")
     .select()
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .single();
 
   if (error) {
     console.error(error);
@@ -37,7 +38,7 @@ export default async function ProtectedPage() {
   let value;
   let id = -1;
 
-  if (!data || data.length === 0) {
+  if (!data) {
     const { data, error } = await supabase
       .from("kilobytes")
       .insert({
@@ -46,7 +47,8 @@ export default async function ProtectedPage() {
         value: "0".repeat(1024),
         user_id: user.id,
       })
-      .select();
+      .select()
+      .single();
     if (error) {
       console.error(error);
       return (
@@ -56,17 +58,17 @@ export default async function ProtectedPage() {
         </p>
       );
     }
-    if (data && data.length !== 0) {
-      id = data[0].id;
+    if (data) {
+      id = data.id;
     }
     fg_color = DEFAULT_FG;
     bg_color = DEFAULT_BG;
     value = "0".repeat(1024);
   } else {
-    id = data[0].id;
-    fg_color = data[0].fg_color;
-    bg_color = data[0].bg_color;
-    value = data[0].value;
+    id = data.id;
+    fg_color = data.fg_color;
+    bg_color = data.bg_color;
+    value = data.value;
   }
 
   return (
@@ -77,6 +79,7 @@ export default async function ProtectedPage() {
         initBgColor={bg_color}
         initFgColor={fg_color}
         initHexString={value}
+        isHidden={data.hidden}
       />
     </div>
   );

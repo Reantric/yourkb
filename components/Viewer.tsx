@@ -5,6 +5,7 @@ import CopyLinkButton from "./LinkButton";
 import { Toaster } from "./ui/toaster";
 import {
   CopyIcon,
+  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   HeartIcon,
@@ -134,12 +135,6 @@ export default memo(function CanvasDisplay({
       });
       return;
     }
-
-    toast({
-      title: "Kilobyte hidden",
-      variant: "success",
-      description: "This kilobyte has been successfully hidden.",
-    });
     refresh();
   };
 
@@ -231,6 +226,21 @@ export default memo(function CanvasDisplay({
               )}
             </Button>
           )}
+          <Button
+            className="p-2.5"
+            title="Download Drawing"
+            onClick={() => {
+              if (!canvasRef.current) return;
+              const canvas = canvasRef.current;
+              const link = document.createElement("a");
+              link.download = `kilobyte-${id}.png`;
+              link.href = canvas.toDataURL("image/png");
+              link.click();
+            }}
+            variant="outline"
+          >
+            <DownloadIcon className="w-5 h-5" />
+          </Button>
           <Button
             className="p-2.5"
             title="Copy Drawing"
