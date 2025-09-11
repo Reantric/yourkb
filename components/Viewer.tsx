@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, memo } from "react";
+import { useEffect, useRef, useState, memo, useTransition } from "react";
 import CopyLinkButton from "./LinkButton";
 import { Toaster } from "./ui/toaster";
 import {
@@ -62,6 +62,8 @@ export default memo(function CanvasDisplay({
 
   // for some reason I can't get window here
   const [finalPixelSize, setFinalPixelSize] = useState(pixelSize);
+
+  const [isLikeChanging, startLikeChange] = useTransition();
 
   useEffect(() => {
     const newFinalPixelSize =
@@ -182,32 +184,35 @@ export default memo(function CanvasDisplay({
           <Button
             title="Like"
             variant={isLiked ? "default" : "outline"}
-            onClick={async () => {
-              const result = await fetch("/api/switchlikestatus", {
-                method: "POST",
-                body: JSON.stringify({
-                  image_id: id,
-                  new_like_status: !isLiked,
-                }),
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-              if (!result.ok) {
-                if (result.status === 401) {
-                  return push("/sign-in");
+            disabled={isLikeChanging}
+            onClick={() =>
+              startLikeChange(async () => {
+                const result = await fetch("/api/switchlikestatus", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    image_id: id,
+                    new_like_status: !isLiked,
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                });
+                if (!result.ok) {
+                  if (result.status === 401) {
+                    return push("/sign-in");
+                  }
+                  const error = await result.json();
+                  if (error) {
+                    toast({
+                      title: "Error liking image",
+                      variant: "destructive",
+                      description: error.message,
+                    });
+                  }
                 }
-                const error = await result.json();
-                if (error) {
-                  toast({
-                    title: "Error liking image",
-                    variant: "destructive",
-                    description: error.message,
-                  });
-                }
-              }
-              refresh();
-            }}
+                refresh();
+              })
+            }
           >
             <HeartIcon className="w-5 h-5 mr-1" /> {numLikes}
           </Button>
