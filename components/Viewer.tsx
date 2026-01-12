@@ -290,11 +290,10 @@ export default memo(function CanvasDisplay({
                   url: window.location.href,
                 });
               } catch (err: unknown) {
-                const e = err as Error & { name?: string };
-                if (e?.name !== "AbortError") {
+                if ((err as Error)?.name !== "AbortError") {
                   toast({
                     title: "Share failed",
-                    description: e?.message || "Unable to share.",
+                    description: (err as Error)?.message || "Unable to share.",
                     variant: "destructive",
                   });
                 }
