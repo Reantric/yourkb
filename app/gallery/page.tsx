@@ -11,7 +11,7 @@ export default async function Gallery() {
   const isAdmin = await isCurrentUserAdmin();
 
   const { data, error } = await (isAdmin
-    ? supabase.from("kilobytes").select().limit(1000) // higher limit for admins, no filter
+    ? supabase.from("kilobyte_like_counts").select().limit(1000) // higher limit for admins, no filter
     : supabase
         .from("kilobyte_like_counts")
         .select()
