@@ -17,7 +17,7 @@ export function encodedRedirect(
 
 /**
  * Returns the absolute origin for the app.
- * Prefers NEXT_PUBLIC_SITE_URL, then VERCEL_URL, and finally localhost.
+ * Prefers VERCEL_PROJECT_PRODUCTION_URL, then VERCEL_URL, and finally localhost.
  * Ensures the value is a plain origin without a trailing slash.
  */
 export function getOrigin(): string {
