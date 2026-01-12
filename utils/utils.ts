@@ -24,7 +24,11 @@ export function getOrigin(): string {
   const explicit = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
   const vercel = process.env.VERCEL_URL?.trim();
 
-  let origin = (explicit ?? `https://${explicit}`) || (vercel ? `https://${vercel}` : "http://localhost:3000");
+  let origin = explicit
+    ? (explicit.startsWith("http") ? explicit : `https://${explicit}`)
+    : vercel
+      ? `https://${vercel}`
+      : "http://localhost:3000";
 
   if (origin.endsWith("/")) origin = origin.slice(0, -1);
   return origin;
