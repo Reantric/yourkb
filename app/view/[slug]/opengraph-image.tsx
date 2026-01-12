@@ -21,11 +21,10 @@ function hexToBinaryString(hexString: string): string {
   return binaryString;
 }
 
-export default async function Image({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function Image(
+  paramsPromise: Promise<{ params: { slug: string } }>
+) {
+  const { params } = await paramsPromise;
   const { slug } = params;
   const id = Number.parseInt(slug);
   if (Number.isNaN(id)) {
