@@ -1,7 +1,38 @@
 import { hasUserLikedImage, isCurrentUserAdmin } from "@/app/actions";
 import Viewer from "@/components/Viewer";
+import type { Metadata } from "next";
 
 import { createClient } from "@/utils/supabase/server";
+import { getOrigin } from "@/utils/utils";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const title = `YourKB #${slug}`;
+  const description = "The simplest way to make your mark on the web";
+  const origin = getOrigin();
+  
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${origin}/view/${slug}`,
+      type: "article",
+      images: [`${origin}/view/${slug}/opengraph-image`],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${origin}/view/${slug}/opengraph-image`],
+    },
+  };
+}
 
 export default async function ViewKilobyte({
   params,

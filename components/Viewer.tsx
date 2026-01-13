@@ -17,6 +17,15 @@ import { useRouter } from "next/navigation";
 
 const GRID_SIZE = 64;
 
+// ---------- Types & helpers ----------
+type WebShareNavigator = Navigator & {
+  share?: (data: ShareData) => Promise<void>;
+  canShare?: (data?: ShareData) => boolean;
+};
+
+const getWebShareNavigator = (): WebShareNavigator | undefined =>
+  typeof navigator === "undefined" ? undefined : (navigator as WebShareNavigator);
+
 // Function to convert hex string to binary string
 const hexToBinaryString = (hexString: string): string => {
   let binaryString = "";
@@ -58,6 +67,16 @@ export default memo(function CanvasDisplay({
   const { refresh, push } = useRouter();
 
   const { toast } = useToast();
+
+  // check if web share api is supported
+  // ideally, we would use navigator.canShare(), but that's not supported in all browsers
+  const [canShare, setCanShare] = useState(false);
+  const [shareDisabled, setShareDisabled] = useState(false);
+  
+  useEffect(() => {
+    const nav = getWebShareNavigator();
+    setCanShare(Boolean(nav?.share));
+  }, []);
 
   const binaryString = hexToBinaryString(hexString);
 
@@ -252,13 +271,33 @@ export default memo(function CanvasDisplay({
           <CopyLinkButton id={id} compact={true} />
           <Button
             className="p-2.5"
-            title="Share Image"
+            title={shareDisabled ? "Share unsupported" : "Share Image"}
+            disabled={shareDisabled}
             onClick={async () => {
-              await navigator.share({
-                title: "Share Image",
-                text: "Check out this image!",
-                url: window.location.href,
-              });
+              if (!canShare) {
+                toast({
+                  title: "Unsupported",
+                  description: "Sharing isn't supported in this browser.",
+                  variant: "destructive",
+                });
+                setShareDisabled(true);
+                return;
+              }
+              try {
+                await (navigator as WebShareNavigator).share({
+                  title: "Share Image",
+                  text: "Check out this image!",
+                  url: window.location.href,
+                });
+              } catch (err: unknown) {
+                if ((err as Error)?.name !== "AbortError") {
+                  toast({
+                    title: "Share failed",
+                    description: (err as Error)?.message || "Unable to share.",
+                    variant: "destructive",
+                  });
+                }
+              }
             }}
             variant="outline"
           >
