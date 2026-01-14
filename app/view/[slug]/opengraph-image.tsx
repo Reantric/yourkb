@@ -22,10 +22,9 @@ function hexToBinaryString(hexString: string): string {
 }
 
 export default async function Image(
-  paramsPromise: Promise<{ params: { slug: string } }>
+  props: { params: Promise<{ slug: string }> }
 ) {
-  const { params } = await paramsPromise;
-  const { slug } = params;
+  const { slug } = await props.params;
   const id = Number.parseInt(slug);
   if (Number.isNaN(id)) {
     return new Response("Invalid id", { status: 400 });
